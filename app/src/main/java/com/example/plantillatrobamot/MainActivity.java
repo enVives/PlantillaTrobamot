@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
     // Variables de lògica del joc
     private int lengthWord = 5;
     private int maxTry = 6;
-
+    private int prova =0;
     // Variables de construcció de la interfície
     public static String grayColor = "#D9E1E8";
     private int widthDisplay;
