@@ -10,17 +10,24 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     // Variables de lògica del joc
     private int lengthWord = 5;
     private int maxTry = 6;
+    private int x = 0;
+    private int y = 0;
     private int prova =0;
     // Variables de construcció de la interfície
     public static String grayColor = "#D9E1E8";
+    public static String ColorCursor="#FCBA03";
     private int widthDisplay;
     private int heightDisplay;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void crearInterficie() {
         crearGraella();
-        crearTeclat();
+        crearTeclat2();
+        //prova();
     }
 
     private void crearGraella() {
@@ -56,49 +64,108 @@ public class MainActivity extends AppCompatActivity {
         gd.setCornerRadius(5);
         gd.setStroke(3, Color.parseColor(grayColor));
 
-        int textViewSize = 150;
-
+        int textViewSize=150;
+        int amplaria=145,altura=150;
+        int separacion=20;
         // Crear un TextView
+        for(int i=0; i<maxTry;i++){
+            for (int j=0;j<lengthWord;j++){
         TextView textView = new TextView(this);
-        textView.setText("A");
+        textView.setText("");
         textView.setBackground(gd);
-        textView.setId(0);
+        String fila_columna=j+""+i;
+        textView.setId(Integer.parseInt(fila_columna));
         textView.setWidth(textViewSize);
         textView.setHeight(textViewSize);
         // Posicionam el TextView
-        textView.setX(widthDisplay/2 - textViewSize/2);
-        textView.setY(heightDisplay/2 - textViewSize/2);
+        textView.setX(amplaria+((j-1)*separacion)+(j*textViewSize));
+        textView.setY(altura +((i-1)*separacion)+(i*textViewSize));
         textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        textView.setTextColor(Color.RED);
         textView.setTextSize(30);
         // Afegir el TextView al layout
         constraintLayout.addView(textView);
+        }
+        }
     }
 
-    private void crearTeclat() {
-        ConstraintLayout constraintLayout = findViewById(R.id.layout);
+    private void crearTeclat2(){
 
-        // Crear el botó
-        Button buttonEsborrar = new Button(this);
-        buttonEsborrar.setText("Esborrar");
-        // Posicionar el botó
-        int buttonWidth = 400;
-        int buttonHeight = 200;
+        ConstraintLayout constraintLayout = findViewById(R.id.layout);
+        int buttonWidth = 103;
+        int buttonHeight = 90;
+        int separació_x = 15;
+
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         params.height = buttonHeight;
         params.width = buttonWidth;
-        buttonEsborrar.setLayoutParams(params);
-        buttonEsborrar.setY(heightDisplay - 100 - buttonHeight);
-        buttonEsborrar.setX(widthDisplay/2 - buttonWidth/2);
-        // Afegir el botó al layout
-        constraintLayout.addView(buttonEsborrar);
-        // Afegir la funcionalitat al botó
-        buttonEsborrar.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                System.out.println("Esborrar!");
+
+        String [] abecedari = {"A","B","C","D","E","F","G","H","I","J",
+                "K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Ç"};
+
+        float altura = heightDisplay -50;
+        float amplaria = widthDisplay;
+        int contador = 26;
+
+        for(int i = 0; i<3 ;i++){
+            amplaria = widthDisplay;
+            for(int j =0;j <9;j++){
+                Button boto = new Button(this);
+                boto.setText(abecedari[contador]);
+                boto.setLayoutParams(params);
+                boto.setBackgroundColor(Color.parseColor(grayColor));
+                boto.setX(amplaria - (buttonWidth+separació_x));
+                boto.setY(altura - (buttonHeight + separació_x));
+                amplaria = boto.getX();
+                constraintLayout.addView(boto);
+                boto.setOnClickListener(this::onClick);
+                contador--;
             }
-        });
+            altura = altura - (buttonHeight + separació_x);
+        }
+
+        float mig = widthDisplay/2;
+        buttonWidth = 180;
+        params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        params.height = buttonHeight;
+        params.width = buttonWidth;
+
+
+        Button boto = new Button(this);
+        boto.setText("Esborrar");
+        boto.setLayoutParams(params);
+        boto.setBackgroundColor(Color.parseColor(grayColor));
+        boto.setX(mig-separació_x-buttonWidth);
+        boto.setY(altura- (separació_x*2) -buttonHeight);
+        constraintLayout.addView(boto);
+        boto.setOnClickListener(this::onClick);
+
+
+        boto = new Button(this);
+        boto.setText("Enviar");
+        boto.setLayoutParams(params);
+        boto.setBackgroundColor(Color.parseColor(grayColor));
+        boto.setX(mig+separació_x);
+        boto.setY(altura- (separació_x*2) -buttonHeight);
+        constraintLayout.addView(boto);
+        boto.setOnClickListener(this::onClick);
+
     }
+        public void onClick(View v) {
+            Button boto = (Button) v;
+            String lletra = boto.getText().toString();
+
+            if((lletra != "Enviar")&&(lletra != "Esborrar")&&(x!= lengthWord)){
+                String id = x+""+y;
+                TextView text = findViewById ( Integer . valueOf ( id ) . intValue () ) ;
+                text.setText(lletra);
+                x += 1;
+            }else if((lletra == "Enviar")&&(y != maxTry)&&(x==lengthWord)){
+                x =0;
+                y +=1;
+            }else if((lletra == "Esborrar")){
+
+            }
+        }
 
     private void hideSystemUI() {
         // Enables regular immersive mode.
