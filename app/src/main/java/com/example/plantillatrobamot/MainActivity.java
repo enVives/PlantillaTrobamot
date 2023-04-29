@@ -27,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
     public static String ColorCursor="#FCBA03";
     private int widthDisplay;
     private int heightDisplay;
-
+    GradientDrawable gd2 = new GradientDrawable();
+    GradientDrawable gd = new GradientDrawable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
         ConstraintLayout constraintLayout = findViewById(R.id.layout);
 
         // Definir les característiques del "pinzell"
-        GradientDrawable gd = new GradientDrawable();
         gd.setCornerRadius(5);
         gd.setStroke(3, Color.parseColor(grayColor));
 
@@ -72,7 +72,13 @@ public class MainActivity extends AppCompatActivity {
             for (int j=0;j<lengthWord;j++){
         TextView textView = new TextView(this);
         textView.setText("");
-        textView.setBackground(gd);
+                if(i==0 &&j==0){
+                    gd2.setCornerRadius(5);
+                    gd2.setStroke(3, Color.parseColor(ColorCursor));
+                    textView.setBackground(gd2);
+                }else{
+                    textView.setBackground(gd);
+                }
         String fila_columna=j+""+i;
         textView.setId(Integer.parseInt(fila_columna));
         textView.setWidth(textViewSize);
@@ -153,17 +159,51 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             Button boto = (Button) v;
             String lletra = boto.getText().toString();
-
+            int xaux=0;
+            TextView textactual=null;
+            String id= x+""+y;
             if((lletra != "Enviar")&&(lletra != "Esborrar")&&(x!= lengthWord)){
-                String id = x+""+y;
-                TextView text = findViewById ( Integer . valueOf ( id ) . intValue () ) ;
-                text.setText(lletra);
-                x += 1;
+                textactual = findViewById ( Integer . valueOf ( id ) . intValue () );
+                TextView textsiguiente;
+                textactual.setText(lletra);
+                textactual.setBackground(gd);
+                x+=1;
+                id=x+""+y;
+                if(x<lengthWord) {
+                    textactual = findViewById(Integer.valueOf(id).intValue());
+                    textactual.setBackground(gd2);
+                }else{
+                    xaux=x;
+                    xaux--;
+                    id = xaux+""+y;
+                    textactual = findViewById(Integer.valueOf(id).intValue());
+                    textactual.setBackground(gd2);
+                }
             }else if((lletra == "Enviar")&&(y != maxTry)&&(x==lengthWord)){
+                x--;
+                id=x+""+y;
+                textactual = findViewById(Integer.valueOf(id).intValue());
+                textactual.setBackground(gd);
                 x =0;
                 y +=1;
+                id=x+""+y;
+                TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                textaux.setBackground(gd2);
             }else if((lletra == "Esborrar")){
-
+                if(x==lengthWord){
+                    x--;
+                    id=x+""+y;
+                }
+                textactual=findViewById(Integer.valueOf(id).intValue());
+                textactual.setText("");
+                x--;
+                textactual.setBackground(gd);
+                if (x<0){
+                    x++;
+                }
+                id=x+""+y;
+                textactual=findViewById(Integer.valueOf(id).intValue());
+                textactual.setBackground(gd2);
             }
         }
 
