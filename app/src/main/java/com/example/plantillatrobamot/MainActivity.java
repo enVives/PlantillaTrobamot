@@ -22,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
     private int x = 0;
     private int y = 0;
     private int prova =0;
+    String [] abecedari = {"A","B","C","D","E","F","G","H","I","J",
+            "K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Ç"};
+
     // Variables de construcció de la interfície
     public static String grayColor = "#D9E1E8";
     public static String ColorCursor="#FCBA03";
@@ -54,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private void crearInterficie() {
         crearGraella();
         crearTeclat2();
+        iniciarConjuntLletres();
         //prova();
     }
 
@@ -70,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
         // Crear un TextView
         for(int i=0; i<maxTry;i++){
             for (int j=0;j<lengthWord;j++){
-        TextView textView = new TextView(this);
-        textView.setText("");
+                TextView textView = new TextView(this);
+                textView.setText("");
                 if(i==0 &&j==0){
                     gd2.setCornerRadius(5);
                     gd2.setStroke(3, Color.parseColor(ColorCursor));
@@ -79,18 +83,18 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     textView.setBackground(gd);
                 }
-        String fila_columna=j+""+i;
-        textView.setId(Integer.parseInt(fila_columna));
-        textView.setWidth(textViewSize);
-        textView.setHeight(textViewSize);
-        // Posicionam el TextView
-        textView.setX(amplaria+((j-1)*separacion)+(j*textViewSize));
-        textView.setY(altura +((i-1)*separacion)+(i*textViewSize));
-        textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        textView.setTextSize(30);
-        // Afegir el TextView al layout
-        constraintLayout.addView(textView);
-        }
+                String fila_columna=j+""+i;
+                textView.setId(Integer.parseInt(fila_columna));
+                textView.setWidth(textViewSize);
+                textView.setHeight(textViewSize);
+                // Posicionam el TextView
+                textView.setX(amplaria+((j-1)*separacion)+(j*textViewSize));
+                textView.setY(altura +((i-1)*separacion)+(i*textViewSize));
+                textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+                textView.setTextSize(30);
+                // Afegir el TextView al layout
+                constraintLayout.addView(textView);
+            }
         }
     }
 
@@ -104,9 +108,6 @@ public class MainActivity extends AppCompatActivity {
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         params.height = buttonHeight;
         params.width = buttonWidth;
-
-        String [] abecedari = {"A","B","C","D","E","F","G","H","I","J",
-                "K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Ç"};
 
         float altura = heightDisplay -50;
         float amplaria = widthDisplay;
@@ -156,58 +157,64 @@ public class MainActivity extends AppCompatActivity {
         boto.setOnClickListener(this::onClick);
 
     }
-        public void onClick(View v) {
-            Button boto = (Button) v;
-            String lletra = boto.getText().toString();
-            int xaux=0;
-            TextView textactual=null;
-            String id= x+""+y;
-            if((lletra != "Enviar")&&(lletra != "Esborrar")&&(x!= lengthWord)&&(y!= maxTry)){
-                textactual = findViewById ( Integer . valueOf ( id ) . intValue () );
-                TextView textsiguiente;
-                textactual.setText(lletra);
-                textactual.setBackground(gd);
-                x+=1;
-                id=x+""+y;
-                if(x<lengthWord) {
-                    textactual = findViewById(Integer.valueOf(id).intValue());
-                    textactual.setBackground(gd2);
-                }else{
-                    xaux=x;
-                    xaux--;
-                    id = xaux+""+y;
-                    textactual = findViewById(Integer.valueOf(id).intValue());
-                    textactual.setBackground(gd2);
-                }
-            }else if((lletra == "Enviar")&&(y != maxTry)&&(x==lengthWord)){
-                x--;
-                id=x+""+y;
+    public void onClick(View v) {
+        Button boto = (Button) v;
+        String lletra = boto.getText().toString();
+        int xaux=0;
+        TextView textactual=null;
+        String id= x+""+y;
+        if((lletra != "Enviar")&&(lletra != "Esborrar")&&(x!= lengthWord)){
+            textactual = findViewById ( Integer . valueOf ( id ) . intValue () );
+            TextView textsiguiente;
+            textactual.setText(lletra);
+            textactual.setBackground(gd);
+            x+=1;
+            id=x+""+y;
+            if(x<lengthWord) {
                 textactual = findViewById(Integer.valueOf(id).intValue());
-                textactual.setBackground(gd);
-                if(y!= maxTry-1){
-                x =0;
-                y +=1;
-                id=x+""+y;
-                TextView textaux = findViewById(Integer.valueOf(id).intValue());
-                textaux.setBackground(gd2);
-                }
-            }else if((lletra == "Esborrar")){
-                if(x==lengthWord){
-                    x--;
-                    id=x+""+y;
-                }
-                textactual=findViewById(Integer.valueOf(id).intValue());
-                textactual.setText("");
-                x--;
-                textactual.setBackground(gd);
-                if (x<0){
-                    x++;
-                }
-                id=x+""+y;
-                textactual=findViewById(Integer.valueOf(id).intValue());
+                textactual.setBackground(gd2);
+            }else{
+                xaux=x;
+                xaux--;
+                id = xaux+""+y;
+                textactual = findViewById(Integer.valueOf(id).intValue());
                 textactual.setBackground(gd2);
             }
+        }else if((lletra == "Enviar")&&(y != maxTry)&&(x==lengthWord)){
+            x--;
+            id=x+""+y;
+            textactual = findViewById(Integer.valueOf(id).intValue());
+            textactual.setBackground(gd);
+            x =0;
+            y +=1;
+            id=x+""+y;
+            TextView textaux = findViewById(Integer.valueOf(id).intValue());
+            textaux.setBackground(gd2);
+        }else if((lletra == "Esborrar")){
+            if(x==lengthWord){
+                x--;
+                id=x+""+y;
+            }
+            textactual=findViewById(Integer.valueOf(id).intValue());
+            textactual.setText("");
+            x--;
+            textactual.setBackground(gd);
+            if (x<0){
+                x++;
+            }
+            id=x+""+y;
+            textactual=findViewById(Integer.valueOf(id).intValue());
+            textactual.setBackground(gd2);
         }
+    }
+
+    private void iniciarConjuntLletres(){
+        //Iniciar mapping de les lletres
+        UnsortedArrayMapping lletres = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length);
+        for (int i=0;i< abecedari.length;i++){
+            lletres.put(abecedari[i],new UnsortedLinkedListSet<Integer>());
+        }
+    }
 
     private void hideSystemUI() {
         // Enables regular immersive mode.
