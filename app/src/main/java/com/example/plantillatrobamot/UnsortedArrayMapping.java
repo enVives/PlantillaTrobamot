@@ -97,10 +97,10 @@ public class UnsortedArrayMapping<K, V>
             return value;
         }
     }
-    private class IteratorUnsortedArraySet implements Iterator {
+    private class IteratorUnsortedArrayMapping implements Iterator {
         private int IdxIterator;
 
-        private IteratorUnsortedArraySet() {
+        private IteratorUnsortedArrayMapping() {
             IdxIterator = 0;
         }
 
@@ -111,15 +111,15 @@ public class UnsortedArrayMapping<K, V>
 
         @Override
         public Object next() {
-            IdxIterator++;
             Pair p = new Pair(keys[IdxIterator],values[IdxIterator]);
+            IdxIterator++;
             return p;
         }
 
     }
 
     public Iterator iterator() {
-        Iterator it = new IteratorUnsortedArraySet();
+        Iterator it = new IteratorUnsortedArrayMapping();
         return it;
     }
 }

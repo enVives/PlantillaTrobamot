@@ -58,8 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void crearInterficie() {
         crearGraella();
-        crearTeclat2();
         iniciarConjuntLletres();
+        crearTeclat2();
+
         //prova();
     }
 
@@ -113,15 +114,16 @@ public class MainActivity extends AppCompatActivity {
 
         float altura = heightDisplay -50;
         float amplaria = widthDisplay;
-        int contador = 26;
-
+        it = lletres.iterator();
         for(int i = 0; i<3 ;i++){
             amplaria = widthDisplay;
             for(int j =0;j <9;j++){
                 Button boto = new Button(this);
-                while(it.hasNext()){
+                if(it.hasNext()){
                 UnsortedArrayMapping.Pair p = (UnsortedArrayMapping.Pair) it.next();
-                boto.setText(p.getKey().toString());}
+                boto.setText(p.getKey().toString());}else{
+                    boto.setText("");
+                }
                 boto.setLayoutParams(params);
                 boto.setBackgroundColor(Color.parseColor(grayColor));
                 boto.setX(amplaria - (buttonWidth+separació_x));
@@ -129,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 amplaria = boto.getX();
                 constraintLayout.addView(boto);
                 boto.setOnClickListener(this::onClick);
-                contador--;
             }
             altura = altura - (buttonHeight + separació_x);
         }
@@ -214,10 +215,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void iniciarConjuntLletres(){
         //Iniciar mapping de les lletres
-        String [] abecedari = {"A","B","C","D","E","F","G","H","I","J",
-                    "K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Ç"};
+        String [] abecedari = {"Ç","Z","Y","X","W","V","U","T","S","R",
+                    "Q","P","O","N","M","L","K","J","I","H","G","F","E","D","C","B","A"};
         lletres = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length);
-        it = lletres.iterator();
+
         for (int i=0;i< abecedari.length;i++){
             lletres.put(abecedari[i],new UnsortedLinkedListSet<Integer>());
         }
