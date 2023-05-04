@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             int xaux=0;
             TextView textactual=null;
             String id= x+""+y;
-            if((lletra != "Enviar")&&(lletra != "Esborrar")&&(x!= lengthWord)){
+            if((lletra != "Enviar")&&(lletra != "Esborrar")&&(x!= lengthWord)&&(y!= maxTry)){
                 textactual = findViewById ( Integer . valueOf ( id ) . intValue () );
                 TextView textsiguiente;
                 textactual.setText(lletra);
@@ -184,11 +184,13 @@ public class MainActivity extends AppCompatActivity {
                 id=x+""+y;
                 textactual = findViewById(Integer.valueOf(id).intValue());
                 textactual.setBackground(gd);
+                if(y!= maxTry-1){
                 x =0;
                 y +=1;
                 id=x+""+y;
                 TextView textaux = findViewById(Integer.valueOf(id).intValue());
                 textaux.setBackground(gd2);
+                }
             }else if((lletra == "Esborrar")){
                 if(x==lengthWord){
                     x--;
