@@ -15,6 +15,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.util.Iterator;
+
 public class MainActivity extends AppCompatActivity {
     // Variables de lògica del joc
     private int lengthWord = 5;
@@ -22,14 +24,14 @@ public class MainActivity extends AppCompatActivity {
     private int x = 0;
     private int y = 0;
     private int prova =0;
-    String [] abecedari = {"A","B","C","D","E","F","G","H","I","J",
-            "K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Ç"};
-
+    UnsortedArrayMapping lletres;
     // Variables de construcció de la interfície
     public static String grayColor = "#D9E1E8";
     public static String ColorCursor="#FCBA03";
     private int widthDisplay;
     private int heightDisplay;
+
+    private Iterator it;
     GradientDrawable gd2 = new GradientDrawable();
     GradientDrawable gd = new GradientDrawable();
 
@@ -117,7 +119,9 @@ public class MainActivity extends AppCompatActivity {
             amplaria = widthDisplay;
             for(int j =0;j <9;j++){
                 Button boto = new Button(this);
-                boto.setText(abecedari[contador]);
+                while(it.hasNext()){
+                UnsortedArrayMapping.Pair p = (UnsortedArrayMapping.Pair) it.next();
+                boto.setText(p.getKey().toString());}
                 boto.setLayoutParams(params);
                 boto.setBackgroundColor(Color.parseColor(grayColor));
                 boto.setX(amplaria - (buttonWidth+separació_x));
@@ -210,7 +214,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void iniciarConjuntLletres(){
         //Iniciar mapping de les lletres
-        UnsortedArrayMapping lletres = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length);
+        String [] abecedari = {"A","B","C","D","E","F","G","H","I","J",
+                    "K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Ç"};
+        lletres = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length);
+        it = lletres.iterator();
         for (int i=0;i< abecedari.length;i++){
             lletres.put(abecedari[i],new UnsortedLinkedListSet<Integer>());
         }

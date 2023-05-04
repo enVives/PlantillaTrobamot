@@ -1,5 +1,7 @@
 package com.example.plantillatrobamot;
 
+import java.util.Iterator;
+
 public class UnsortedArrayMapping<K, V>
 {
     // Atributos:
@@ -77,6 +79,48 @@ public class UnsortedArrayMapping<K, V>
     public boolean isEmpty()
     {
         return (n == 0);
+    }
+
+    protected  class Pair{
+        private K key;
+        private V value;
+        private Pair(K key, V value){
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+    }
+    private class IteratorUnsortedArraySet implements Iterator {
+        private int IdxIterator;
+
+        private IteratorUnsortedArraySet() {
+            IdxIterator = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return IdxIterator < n;
+        }
+
+        @Override
+        public Object next() {
+            IdxIterator++;
+            Pair p = new Pair(keys[IdxIterator],values[IdxIterator]);
+            return p;
+        }
+
+    }
+
+    public Iterator iterator() {
+        Iterator it = new IteratorUnsortedArraySet();
+        return it;
     }
 }
 
