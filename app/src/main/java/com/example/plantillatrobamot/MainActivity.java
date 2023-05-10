@@ -3,6 +3,7 @@ package com.example.plantillatrobamot;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Iterator;
 
@@ -165,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View v) {
         Button boto = (Button) v;
         String lletra = boto.getText().toString();
-        int xaux=0;
+
         TextView textactual=null;
         String id= x+""+y;
         if((lletra != "Enviar")&&(lletra != "Esborrar")&&(x!= lengthWord)){
@@ -179,22 +181,29 @@ public class MainActivity extends AppCompatActivity {
                 textactual = findViewById(Integer.valueOf(id).intValue());
                 textactual.setBackground(gd2);
             }else{
-                xaux=x;
-                xaux--;
-                id = xaux+""+y;
+                id = (x-1)+""+y;
                 textactual = findViewById(Integer.valueOf(id).intValue());
                 textactual.setBackground(gd2);
             }
-        }else if((lletra == "Enviar")&&(y != maxTry)&&(x==lengthWord)){
-            x--;
-            id=x+""+y;
-            textactual = findViewById(Integer.valueOf(id).intValue());
-            textactual.setBackground(gd);
-            x =0;
-            y +=1;
-            id=x+""+y;
-            TextView textaux = findViewById(Integer.valueOf(id).intValue());
-            textaux.setBackground(gd2);
+        }else if((lletra == "Enviar")&&(y != maxTry-1)){
+            if(x== lengthWord){
+                id=(x-1)+""+y;
+                textactual = findViewById(Integer.valueOf(id).intValue());
+                textactual.setBackground(gd);
+                x =0;
+                y +=1;
+                id=x+""+y;
+                TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                textaux.setBackground(gd2);
+            }else{
+                Context context = getApplicationContext();
+                CharSequence mostra = "LLetres Insuficients";
+                int duration = Toast.LENGTH_LONG;
+
+                Toast toast = Toast.makeText(context,mostra,duration);
+                toast.show();
+            }
+
         }else if((lletra == "Esborrar")){
             if(x==lengthWord){
                 x--;
