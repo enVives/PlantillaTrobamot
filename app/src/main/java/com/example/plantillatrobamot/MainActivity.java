@@ -17,7 +17,15 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.io.InputStream;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity {
     // Variables de lògica del joc
@@ -26,13 +34,18 @@ public class MainActivity extends AppCompatActivity {
     private int x = 0;
     private int y = 0;
     private int prova =0;
+    private int numeropalabras=0;
+    private String palabrasolucion="";
     UnsortedArrayMapping lletres;
     // Variables de construcció de la interfície
     public static String grayColor = "#D9E1E8";
     public static String ColorCursor="#FCBA03";
     private int widthDisplay;
     private int heightDisplay;
+    HashMap<String, String> diccionari = new HashMap<String, String>();
+    Iterator IteratorMap = (Iterator) diccionari.keySet().iterator();
 
+    TreeMap<String,String> arbre= new TreeMap();
     private Iterator it;
     GradientDrawable gd2 = new GradientDrawable();
     GradientDrawable gd = new GradientDrawable();
@@ -62,8 +75,21 @@ public class MainActivity extends AppCompatActivity {
         crearGraella();
         iniciarConjuntLletres();
         crearTeclat2();
-
+        llegirdiccionari();
+        paraulasolucio();
         //prova();
+    }
+
+    private void paraulasolucio(){
+        Random ran = new Random();
+        int numero = ran.nextInt(numeropalabras);
+
+
+
+
+
+
+
     }
 
     private void crearGraella() {
@@ -232,7 +258,36 @@ public class MainActivity extends AppCompatActivity {
             lletres.put(abecedari[i],new UnsortedLinkedListSet<Integer>());
         }
     }
+    private void llegirdiccionari(){
+        InputStream is = getResources().openRawResource(R.raw.paraules);
+        BufferedReader buffer=null;
+        try{
+            buffer = new BufferedReader(new InputStreamReader(is)) ;
+            String linia = buffer.readLine();
 
+            while(linia!=null){
+                String [] paraules = linia.split(";");
+                if(paraules[0].length()== lengthWord){
+                    diccionari.put(paraules[0],paraules[1]);
+                    arbre.put(paraules[0],paraules[1]);
+                    numeropalabras++;
+                }
+                linia = buffer.readLine();
+            }
+
+        }catch(IOException error){
+            System.out.println(error.toString());
+        }finally{
+            try{
+                buffer.close();
+            }catch(Exception error){
+                System.out.println(error.toString());
+            }
+        }
+
+
+
+    }
     private void hideSystemUI() {
         // Enables regular immersive mode.
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
