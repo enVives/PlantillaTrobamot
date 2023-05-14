@@ -11,9 +11,6 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +20,6 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -36,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private int prova =0;
     private int numeropalabras=0;
     private String palabrasolucion="";
-    UnsortedArrayMapping lletres;
+    UnsortedArrayMapping lletresParauaEnviada;
     // Variables de construcció de la interfície
     public static String grayColor = "#D9E1E8";
     public static String ColorCursor="#FCBA03";
@@ -81,14 +77,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void paraulasolucio(){
+        String clau="";
         Random ran = new Random();
         int numero = ran.nextInt(numeropalabras);
-
-
-
-
-
-
+        for (int i = 0; i < numero; i++) {
+            clau = (String) IteratorMap.next();
+        }
+        palabrasolucion=diccionari.get(clau);
 
     }
 
@@ -142,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
         float altura = heightDisplay -50;
         float amplaria = widthDisplay;
-        it = lletres.iterator();
+        it = lletresParauaEnviada.iterator();
         for(int i = 0; i<3 ;i++){
             amplaria = widthDisplay;
             for(int j =0;j <9;j++){
@@ -201,6 +196,8 @@ public class MainActivity extends AppCompatActivity {
             TextView textsiguiente;
             textactual.setText(lletra);
             textactual.setBackground(gd);
+
+
             x+=1;
             id=x+""+y;
             if(x<lengthWord) {
@@ -212,23 +209,29 @@ public class MainActivity extends AppCompatActivity {
                 textactual.setBackground(gd2);
             }
         }else if((lletra == "Enviar")&&(y != maxTry-1)){
-            if(x== lengthWord){
-                id=(x-1)+""+y;
-                textactual = findViewById(Integer.valueOf(id).intValue());
-                textactual.setBackground(gd);
-                x =0;
-                y +=1;
-                id=x+""+y;
-                TextView textaux = findViewById(Integer.valueOf(id).intValue());
-                textaux.setBackground(gd2);
-            }else{
+            if(x != lengthWord){
                 Context context = getApplicationContext();
                 CharSequence mostra = "LLetres Insuficients";
                 int duration = Toast.LENGTH_LONG;
 
                 Toast toast = Toast.makeText(context,mostra,duration);
                 toast.show();
+            }else {
+                id = (x - 1) + "" + y;
+                textactual = findViewById(Integer.valueOf(id).intValue());
+                textactual.setBackground(gd);
+
+                //Comprobació de que la paraula es vàlida
+                //Comprobació de que la paraula es la solució
+
+                x = 0;
+                y += 1;
+                id = x + "" + y;
+                TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                textaux.setBackground(gd2);
+
             }
+
 
         }else if((lletra == "Esborrar")){
             if(x==lengthWord){
@@ -252,11 +255,12 @@ public class MainActivity extends AppCompatActivity {
         //Iniciar mapping de les lletres
         String [] abecedari = {"Ç","Z","Y","X","W","V","U","T","S","R",
                     "Q","P","O","N","M","L","K","J","I","H","G","F","E","D","C","B","A"};
-        lletres = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length);
+        lletresParauaEnviada = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length);
 
         for (int i=0;i< abecedari.length;i++){
-            lletres.put(abecedari[i],new UnsortedLinkedListSet<Integer>());
+            lletresParauaEnviada.put(abecedari[i],new UnsortedLinkedListSet<Integer>());
         }
+
     }
     private void llegirdiccionari(){
         InputStream is = getResources().openRawResource(R.raw.paraules);
