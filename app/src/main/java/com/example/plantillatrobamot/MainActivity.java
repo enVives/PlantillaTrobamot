@@ -20,6 +20,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private int widthDisplay;
     private int heightDisplay;
     HashMap<String, String> diccionari = new HashMap<String, String>();
-    Iterator IteratorMap = (Iterator) diccionari.keySet().iterator();
+    java.util.Iterator iter;
 
     TreeMap<String,String> arbre= new TreeMap();
     private Iterator it;
@@ -80,10 +82,14 @@ public class MainActivity extends AppCompatActivity {
         String clau="";
         Random ran = new Random();
         int numero = ran.nextInt(numeropalabras);
+        iter = diccionari.entrySet().iterator();
+
         for (int i = 0; i < numero; i++) {
-            clau = (String) IteratorMap.next();
+            if(iter.hasNext()){
+                Map.Entry entry = (Map.Entry) iter.next();
+                palabrasolucion = (String) entry.getKey();
+            }
         }
-        palabrasolucion=diccionari.get(clau);
 
     }
 
