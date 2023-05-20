@@ -5,6 +5,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -21,7 +22,6 @@ import java.util.HashMap;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private int prova =0;
     private int numeropalabras=0;
     private String palabrasolucion="";
-    UnsortedArrayMapping lletresParauaEnviada;
+    private String palabraEnviada="";
+    UnsortedArrayMapping lletresSolucio;
     // Variables de construcció de la interfície
     public static String grayColor = "#D9E1E8";
     public static String ColorCursor="#FCBA03";
@@ -71,10 +72,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void crearInterficie() {
         crearGraella();
-        iniciarConjuntLletres();
-        crearTeclat2();
         llegirdiccionari();
         paraulasolucio();
+        iniciarConjuntLletres();
+        crearTeclat2();
+
         //prova();
     }
 
@@ -143,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
         float altura = heightDisplay -50;
         float amplaria = widthDisplay;
-        it = lletresParauaEnviada.iterator();
+        it = lletresSolucio.iterator();
         for(int i = 0; i<3 ;i++){
             amplaria = widthDisplay;
             for(int j =0;j <9;j++){
@@ -227,9 +229,8 @@ public class MainActivity extends AppCompatActivity {
                 textactual = findViewById(Integer.valueOf(id).intValue());
                 textactual.setBackground(gd);
 
-                //Comprobació de que la paraula es vàlida
-                //Comprobació de que la paraula es la solució
-
+                //Obtenció de la paraula TO DO
+                comprobacio();
                 x = 0;
                 y += 1;
                 id = x + "" + y;
@@ -258,15 +259,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void iniciarConjuntLletres(){
+        String abecedari ="ÇZYXWVUTRSRQPONMLKJIHGFEDCBA";
         //Iniciar mapping de les lletres
-        String [] abecedari = {"Ç","Z","Y","X","W","V","U","T","S","R",
-                    "Q","P","O","N","M","L","K","J","I","H","G","F","E","D","C","B","A"};
-        lletresParauaEnviada = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length);
+        lletresSolucio = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
 
-        for (int i=0;i< abecedari.length;i++){
-            lletresParauaEnviada.put(abecedari[i],new UnsortedLinkedListSet<Integer>());
+        for (int i=0;i< abecedari.length();i++){
+            UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
+            //Bucle per afegir la posició corresponent de les lletres que es troben a sa paraula solucio
+            for (int j = 0; j < palabrasolucion.length(); j++) {
+                if (palabrasolucion.charAt(j)==abecedari.charAt(i));
+                llistaPosicions.add(j+1); //Posicio de la lletra incial ==1 (Pot ser se tendra que cambiar)
+            }
+
+            lletresSolucio.put(abecedari.charAt(i),llistaPosicions);
         }
-
     }
     private void llegirdiccionari(){
         InputStream is = getResources().openRawResource(R.raw.paraules);
@@ -296,6 +302,33 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+
+    }
+
+    private void comprobacio(){
+        //Si la paraula no existeix
+        if (!diccionari.containsValue(palabraEnviada)){
+            Context context = getApplicationContext();
+            CharSequence mostra = "Paraula no vàlida!";
+            int duration = Toast.LENGTH_LONG;
+
+            Toast toast = Toast.makeText(context,mostra,duration);
+            toast.show();
+        }else {
+            for (int i = 0; i < palabraEnviada.length(); i++) {
+                UnsortedLinkedListSet<Integer> aux = (UnsortedLinkedListSet<Integer>) lletresSolucio.get(palabraEnviada.charAt(i));
+                if (aux.isEmpty()){
+                    //Vermell TO DO
+                }
+                if(aux.contains(i+1)){
+                    //Verd TO DO
+                }
+                if (!aux.isEmpty() && !aux.contains(i+1)){
+                    //Groc TO DO
+                }
+
+            }
+        }
 
     }
     private void hideSystemUI() {
