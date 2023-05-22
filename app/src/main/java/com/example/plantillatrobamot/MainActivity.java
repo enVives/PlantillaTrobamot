@@ -190,7 +190,19 @@ public class MainActivity extends AppCompatActivity {
         boto.setX(mig+separació_x);
         boto.setY(altura- (separació_x*2) -buttonHeight);
         constraintLayout.addView(boto);
+
         boto.setOnClickListener(this::onClick);
+
+        TextView paraula_sol = new TextView(this);
+        paraula_sol.setText(palabrasolucion);
+
+        paraula_sol.setId((int) 100);
+        paraula_sol.setX(widthDisplay/2);
+        paraula_sol.setY(100+heightDisplay/2);
+
+        paraula_sol.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        // Afegir el TextView al layout
+        constraintLayout.addView(paraula_sol);
 
     }
     public void onClick(View v) {
@@ -230,7 +242,16 @@ public class MainActivity extends AppCompatActivity {
                 textactual.setBackground(gd);
 
                 //Obtenció de la paraula TO DO
+
+                TextView auxiliar;
+
+                for(int x =0;x<lengthWord;x++){
+                    auxiliar = findViewById(Integer.valueOf(x+""+y).intValue());
+                    palabraEnviada += (String) auxiliar.getText();
+                }
+
                 comprobacio();
+
                 x = 0;
                 y += 1;
                 id = x + "" + y;
@@ -260,6 +281,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void iniciarConjuntLletres(){
         String abecedari ="ÇZYXWVUTRSRQPONMLKJIHGFEDCBA";
+        String minuscula = abecedari.toLowerCase();
+
         //Iniciar mapping de les lletres
         lletresSolucio = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
 
@@ -267,8 +290,9 @@ public class MainActivity extends AppCompatActivity {
             UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
             //Bucle per afegir la posició corresponent de les lletres que es troben a sa paraula solucio
             for (int j = 0; j < palabrasolucion.length(); j++) {
-                if (palabrasolucion.charAt(j)==abecedari.charAt(i));
-                llistaPosicions.add(j+1); //Posicio de la lletra incial ==1 (Pot ser se tendra que cambiar)
+                if (palabrasolucion.charAt(j)==minuscula.charAt(i)){
+                    llistaPosicions.add(j+1); //Posicio de la lletra incial ==1 (Pot ser se tendra que cambiar)
+                }
             }
 
             lletresSolucio.put(abecedari.charAt(i),llistaPosicions);
@@ -307,28 +331,57 @@ public class MainActivity extends AppCompatActivity {
 
     private void comprobacio(){
         //Si la paraula no existeix
-        if (!diccionari.containsValue(palabraEnviada)){
+        String minuscula = palabraEnviada.toLowerCase();
+        if(minuscula.equals(palabrasolucion)){
             Context context = getApplicationContext();
-            CharSequence mostra = "Paraula no vàlida!";
+            CharSequence mostra = "Paraula Correcte";
             int duration = Toast.LENGTH_LONG;
 
             Toast toast = Toast.makeText(context,mostra,duration);
             toast.show();
-        }else {
-            for (int i = 0; i < palabraEnviada.length(); i++) {
-                UnsortedLinkedListSet<Integer> aux = (UnsortedLinkedListSet<Integer>) lletresSolucio.get(palabraEnviada.charAt(i));
-                if (aux.isEmpty()){
-                    //Vermell TO DO
-                }
-                if(aux.contains(i+1)){
-                    //Verd TO DO
-                }
-                if (!aux.isEmpty() && !aux.contains(i+1)){
-                    //Groc TO DO
-                }
 
+            String id;
+            for (int i = 0; i < palabraEnviada.length(); i++) {
+                id = i+""+y;
+                TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                textaux.setBackgroundColor(Color.GREEN);
+            }
+        }else{
+            if (!diccionari.containsValue(minuscula)){
+                Context context = getApplicationContext();
+                CharSequence mostra = "Paraula no vàlida!";
+                int duration = Toast.LENGTH_LONG;
+
+                Toast toast = Toast.makeText(context,mostra,duration);
+                toast.show();
+                palabraEnviada = "";
+            }else {
+                int x = 0;
+                String id;
+                for (int i = 0; i < palabraEnviada.length(); i++) {
+                    id = i+""+y;
+                    UnsortedLinkedListSet<Integer> aux = (UnsortedLinkedListSet<Integer>) lletresSolucio.get(palabraEnviada.charAt(i));
+                    if (aux.isEmpty()){
+                        TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                        textaux.setBackgroundColor(Color.GRAY);
+                    }
+                    if(aux.contains(i+1)){
+                        TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                        textaux.setBackgroundColor(Color.GREEN);
+                        //Verd TO DO
+                    }
+                    if (!aux.isEmpty() && !aux.contains(i+1)){
+                        TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                        textaux.setBackgroundColor(Color.YELLOW);
+                        //Groc TO DO
+                    }
+
+
+                }
+                palabraEnviada = "";
             }
         }
+
 
     }
     private void hideSystemUI() {
