@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private String palabrasolucion="";
     private String palabraEnviada="";
     UnsortedArrayMapping lletresSolucio;
+    UnsortedArrayMapping pistesDescobertes; //per guardar les pistes descobertes
     // Variables de construcció de la interfície
     public static String grayColor = "#D9E1E8";
     public static String ColorCursor="#FCBA03";
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < numero; i++) {
             if(iter.hasNext()){
                 Map.Entry entry = (Map.Entry) iter.next();
-                palabrasolucion = (String) entry.getKey();
+                palabrasolucion = (String) entry.getValue();
             }
         }
 
@@ -285,6 +286,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Iniciar mapping de les lletres
         lletresSolucio = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
+        pistesDescobertes = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
 
         for (int i=0;i< abecedari.length();i++){
             UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
@@ -354,6 +356,13 @@ public class MainActivity extends AppCompatActivity {
 
                 Toast toast = Toast.makeText(context,mostra,duration);
                 toast.show();
+
+                for(int x =0;x<lengthWord;x++){
+                    String id = x+""+y;
+                    TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                    textaux.setText("");
+                }
+                y-=1;
                 palabraEnviada = "";
             }else {
                 int x = 0;
@@ -368,6 +377,11 @@ public class MainActivity extends AppCompatActivity {
                     if(aux.contains(i+1)){
                         TextView textaux = findViewById(Integer.valueOf(id).intValue());
                         textaux.setBackgroundColor(Color.GREEN);
+                        UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
+                        llistaPosicions = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(palabraEnviada.charAt(i));
+                        llistaPosicions.add(i+1);
+                        pistesDescobertes.put(palabraEnviada.charAt(i),llistaPosicions);
+                        System.out.println("");
                         //Verd TO DO
                     }
                     if (!aux.isEmpty() && !aux.contains(i+1)){
