@@ -5,6 +5,7 @@ public class UnsortedLinkedListSet<E> {
     private class Node<E>{
         private E elem;
         private Node next;
+
         //Constructor de Node
         private Node(E element,Node n){
             elem = element;
@@ -14,9 +15,11 @@ public class UnsortedLinkedListSet<E> {
     }
     //Primer Node
     private Node first;
+    private int numero;
     //Constructor
     public UnsortedLinkedListSet(){
         first=null;
+        numero = 0;
     }
 
     //Mètode per comprobar si la llista es buida
@@ -43,6 +46,8 @@ public class UnsortedLinkedListSet<E> {
         if (!trobat){
             Node n= new Node(elem,first);
             first=n;
+            numero +=1;
+
         }
         return !trobat;
     }
@@ -55,6 +60,7 @@ public class UnsortedLinkedListSet<E> {
             if (!trobat){
                 pp=p;
                 p=p.next;
+                numero -=1;
             }
         }
 
@@ -66,6 +72,10 @@ public class UnsortedLinkedListSet<E> {
             }
         }
         return trobat;
+    }
+
+    public int getNumero(){
+        return numero;
     }
 
 

@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     UnsortedArrayMapping lletresSolucio;
     UnsortedArrayMapping pistesDescobertes; //per guardar les pistes descobertes
     // Variables de construcció de la interfície
+    private int num_combinacions;
     public static String grayColor = "#D9E1E8";
     public static String ColorCursor="#FCBA03";
     private int widthDisplay;
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void crearInterficie() {
+        num_combinacions =0;
         crearGraella();
         llegirdiccionari();
         paraulasolucio();
@@ -86,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
         Random ran = new Random();
         int numero = ran.nextInt(numeropalabras);
         iter = diccionari.entrySet().iterator();
-
         for (int i = 0; i < numero; i++) {
             if(iter.hasNext()){
                 Map.Entry entry = (Map.Entry) iter.next();
@@ -205,6 +206,14 @@ public class MainActivity extends AppCompatActivity {
         // Afegir el TextView al layout
         constraintLayout.addView(paraula_sol);
 
+        TextView combinacions = new TextView(this);
+        String s = ""+num_combinacions;
+        combinacions.setText(s);
+        combinacions.setId((int) 101);
+        combinacions.setX(widthDisplay/2);
+        combinacions.setY(150+heightDisplay/2);
+        constraintLayout.addView(combinacions);
+
     }
     public void onClick(View v) {
         Button boto = (Button) v;
@@ -290,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i=0;i< abecedari.length();i++){
             UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
+            UnsortedLinkedListSet<Integer> llistaPosicions1= new UnsortedLinkedListSet<Integer>();
             //Bucle per afegir la posició corresponent de les lletres que es troben a sa paraula solucio
             for (int j = 0; j < palabrasolucion.length(); j++) {
                 if (palabrasolucion.charAt(j)==minuscula.charAt(i)){
@@ -298,6 +308,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             lletresSolucio.put(abecedari.charAt(i),llistaPosicions);
+            pistesDescobertes.put(abecedari.charAt(i),llistaPosicions1);
         }
     }
     private void llegirdiccionari(){
@@ -381,7 +392,6 @@ public class MainActivity extends AppCompatActivity {
                         llistaPosicions = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(palabraEnviada.charAt(i));
                         llistaPosicions.add(i+1);
                         pistesDescobertes.put(palabraEnviada.charAt(i),llistaPosicions);
-                        System.out.println("");
                         //Verd TO DO
                     }
                     if (!aux.isEmpty() && !aux.contains(i+1)){
@@ -392,12 +402,55 @@ public class MainActivity extends AppCompatActivity {
 
 
                 }
+                //combinacions();
                 palabraEnviada = "";
             }
         }
 
 
     }
+    private int numero_restriccions(){
+        Iterator it = pistesDescobertes.iterator();
+        int n =0;
+        while(it.hasNext()){
+            UnsortedArrayMapping.Pair p = (UnsortedArrayMapping.Pair) it.next();
+            n+=1;
+        }
+
+        return n;
+    }
+    private void combinacions(){
+        TreeMap<String,String> arbre_aux= new TreeMap();
+        //Iterator it = arbre.entrySet().iterator();
+        int numero_total = numero_restriccions();
+        int numero_descobert =0;
+        String paraula="";
+        String paraula_accent="";
+
+        while(it.hasNext()){
+            Map.Entry entry = (Map.Entry) it.next();
+            paraula = (String) entry.getValue();
+            paraula_accent = (String) entry.getKey();
+
+            for(int i =0;i<paraula.length();i++){
+                UnsortedLinkedListSet<Integer> aux = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(paraula.charAt(i));
+                if(aux.isEmpty()){
+                }else if(aux.contains(i+1)){
+                    numero_descobert +=1;
+                }
+            }
+            if(numero_total == numero_descobert){
+                arbre_aux.put(paraula_accent,paraula);
+                num_combinacions++;
+            }
+        }
+        TextView textaux = findViewById(Integer.valueOf(101).intValue());
+        textaux.setText(num_combinacions);
+
+
+    }
+
+
     private void hideSystemUI() {
         // Enables regular immersive mode.
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
