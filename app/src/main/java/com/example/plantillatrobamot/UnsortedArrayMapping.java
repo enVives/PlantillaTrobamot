@@ -17,6 +17,10 @@ public class UnsortedArrayMapping<K, V>
         n = 0;
     }
 
+    public int getN(){
+        return n;
+    }
+
     // O(n): cerca lineal
     // Consultar el valor associat a la clau
     public V get(K key)

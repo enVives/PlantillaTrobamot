@@ -1,5 +1,7 @@
 package com.example.plantillatrobamot;
 
+import java.util.Iterator;
+
 public class UnsortedLinkedListSet<E> {
     //Classe Node
     private class Node<E>{
@@ -10,6 +12,10 @@ public class UnsortedLinkedListSet<E> {
         private Node(E element,Node n){
             elem = element;
             next=n;
+        }
+
+        public E getElem(){
+            return elem;
         }
 
     }
@@ -73,6 +79,25 @@ public class UnsortedLinkedListSet<E> {
         }
         return trobat;
     }
+    public Iterator iterator() {
+        Iterator it = new IteratorUnsortedLinkedListSet();
+        return  it;
+    }
+    private class IteratorUnsortedLinkedListSet implements Iterator {
+        private Node idxIterator;
+        private IteratorUnsortedLinkedListSet() {
+            idxIterator = first;
+        }
+        public boolean hasNext() {
+            return idxIterator != null;
+        }
+        public Object next() {
+            E elem = (E) idxIterator.getElem();
+            idxIterator = idxIterator.next;
+            return elem;
+        }
+    }
+
 
     public int getNumero(){
         return numero;

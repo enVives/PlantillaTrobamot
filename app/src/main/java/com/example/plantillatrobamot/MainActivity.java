@@ -18,6 +18,7 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -386,8 +387,8 @@ public class MainActivity extends AppCompatActivity {
                         textaux.setBackgroundColor(Color.GRAY);
                     }
                     if(aux.contains(i+1)){
-                        TextView textaux = findViewById(Integer.valueOf(id).intValue());
-                        textaux.setBackgroundColor(Color.GREEN);
+                        //TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                        //textaux.setBackgroundColor(Color.GREEN);
                         UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
                         llistaPosicions = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(palabraEnviada.charAt(i));
                         llistaPosicions.add(i+1);
@@ -395,57 +396,80 @@ public class MainActivity extends AppCompatActivity {
                         //Verd TO DO
                     }
                     if (!aux.isEmpty() && !aux.contains(i+1)){
-                        TextView textaux = findViewById(Integer.valueOf(id).intValue());
-                        textaux.setBackgroundColor(Color.YELLOW);
+                        UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
+                        llistaPosicions = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(palabraEnviada.charAt(i));
+                        llistaPosicions.add(i+1);
+                        pistesDescobertes.put(palabraEnviada.charAt(i),llistaPosicions);
+                        //TextView textaux = findViewById(Integer.valueOf(id).intValue());
+                        //textaux.setBackgroundColor(Color.YELLOW);
                         //Groc TO DO
                     }
-
-
                 }
-                //combinacions();
+
+                Iterator i = pistesDescobertes.iterator();
+
+                while(i.hasNext()){
+                    UnsortedArrayMapping.Pair pair = (UnsortedArrayMapping.Pair) i.next();
+                    String lletra = pair.getKey().toString();
+                    UnsortedLinkedListSet<Integer> nostre = (UnsortedLinkedListSet<Integer>) pair.getValue();
+
+                    if(!nostre.isEmpty()){
+                        ArrayList<Integer> verds = new ArrayList<>();
+                        ArrayList<Integer> grocs = new ArrayList<>();
+                        UnsortedLinkedListSet<Integer> teclat = (UnsortedLinkedListSet<Integer>) lletresSolucio.get(lletra.charAt(0));
+
+                        Iterator llista = nostre.iterator();
+                        while(llista.hasNext()){
+                            Integer posicio = (Integer) llista.next();
+                            if(teclat.contains(posicio)){
+                                verds.add(posicio);
+                            }else{
+                                grocs.add(posicio);
+                            }
+                        }
+
+                        int numero_verds = verds.size();
+                        int numero_grocs = grocs.size();
+                        int total = teclat.getNumero();
+
+                        if(numero_verds+numero_grocs>total){
+                            for(int j=0;j<verds.size();j++){
+                                String ide = (verds.get(j)-1)+""+y;
+                                TextView textaux = findViewById(Integer.valueOf(ide).intValue());
+                                textaux.setBackgroundColor(Color.GREEN);
+                            }
+
+                            for(int k =0;k<grocs.size();k++){
+                                if((k+1)<=total-numero_verds){
+                                    String ide = (grocs.get(k)-1)+""+y;
+                                    TextView textaux = findViewById(Integer.valueOf(ide).intValue());
+                                    textaux.setBackgroundColor(Color.YELLOW);
+                                }else{
+                                    String ide = (grocs.get(k)-1)+""+y;
+                                    TextView textaux = findViewById(Integer.valueOf(ide).intValue());
+                                    textaux.setBackgroundColor(Color.GRAY);
+                                }
+                            }
+                        }else{
+                            for(int j=0;j<verds.size();j++){
+                                String ide = (verds.get(j)-1)+""+y;
+                                TextView textaux = findViewById(Integer.valueOf(ide).intValue());
+                                textaux.setBackgroundColor(Color.GREEN);
+                            }
+
+                            for(int k =0;k<grocs.size();k++){
+                                String ide = (grocs.get(k)-1)+""+y;
+                                TextView textaux = findViewById(Integer.valueOf(ide).intValue());
+                                textaux.setBackgroundColor(Color.YELLOW);
+                            }
+                        }
+                    }
+                }
+
                 palabraEnviada = "";
+                iniciarConjuntLletres(); //millorable
             }
         }
-
-
-    }
-    private int numero_restriccions(){
-        Iterator it = pistesDescobertes.iterator();
-        int n =0;
-        while(it.hasNext()){
-            UnsortedArrayMapping.Pair p = (UnsortedArrayMapping.Pair) it.next();
-            n+=1;
-        }
-
-        return n;
-    }
-    private void combinacions(){
-        TreeMap<String,String> arbre_aux= new TreeMap();
-        //Iterator it = arbre.entrySet().iterator();
-        int numero_total = numero_restriccions();
-        int numero_descobert =0;
-        String paraula="";
-        String paraula_accent="";
-
-        while(it.hasNext()){
-            Map.Entry entry = (Map.Entry) it.next();
-            paraula = (String) entry.getValue();
-            paraula_accent = (String) entry.getKey();
-
-            for(int i =0;i<paraula.length();i++){
-                UnsortedLinkedListSet<Integer> aux = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(paraula.charAt(i));
-                if(aux.isEmpty()){
-                }else if(aux.contains(i+1)){
-                    numero_descobert +=1;
-                }
-            }
-            if(numero_total == numero_descobert){
-                arbre_aux.put(paraula_accent,paraula);
-                num_combinacions++;
-            }
-        }
-        TextView textaux = findViewById(Integer.valueOf(101).intValue());
-        textaux.setText(num_combinacions);
 
 
     }
