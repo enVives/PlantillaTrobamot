@@ -24,7 +24,11 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Html;
 
 public class MainActivity extends AppCompatActivity {
     // Variables de lògica del joc
@@ -44,10 +48,13 @@ public class MainActivity extends AppCompatActivity {
     public static String ColorCursor="#FCBA03";
     private int widthDisplay;
     private int heightDisplay;
+    public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE ";
+
     HashMap<String, String> diccionari = new HashMap<String, String>();
     java.util.Iterator iter;
 
     TreeMap<String,String> arbre= new TreeMap();
+
     private Iterator it;
     GradientDrawable gd2 = new GradientDrawable();
     GradientDrawable gd = new GradientDrawable();
@@ -104,10 +111,9 @@ public class MainActivity extends AppCompatActivity {
         // Definir les característiques del "pinzell"
         gd.setCornerRadius(5);
         gd.setStroke(3, Color.parseColor(grayColor));
-
-        int textViewSize=150;
         int amplaria=145,altura=150;
         int separacion=20;
+        int textViewSize=((widthDisplay-amplaria*2-separacion*(lengthWord-1)))/lengthWord;
         // Crear un TextView
         for(int i=0; i<maxTry;i++){
             for (int j=0;j<lengthWord;j++){
@@ -155,7 +161,11 @@ public class MainActivity extends AppCompatActivity {
                 Button boto = new Button(this);
                 if(it.hasNext()){
                 UnsortedArrayMapping.Pair p = (UnsortedArrayMapping.Pair) it.next();
-                boto.setText(p.getKey().toString());}else{
+                boto.setText(p.getKey().toString());
+                char letra =p.getKey().toString().charAt(0);
+                int codigoAscii=(int)letra;
+                boto.setId(codigoAscii);
+                }else{
                     boto.setText("");
                 }
                 boto.setLayoutParams(params);
@@ -199,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         TextView paraula_sol = new TextView(this);
         paraula_sol.setText(palabrasolucion);
 
-        paraula_sol.setId((int) 100);
+        paraula_sol.setId(Integer.valueOf(127).intValue());
         paraula_sol.setX(widthDisplay/2);
         paraula_sol.setY(100+heightDisplay/2);
 
@@ -210,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
         TextView combinacions = new TextView(this);
         String s = ""+num_combinacions;
         combinacions.setText(s);
-        combinacions.setId((int) 101);
+        combinacions.setId(Integer.valueOf(126).intValue());
         combinacions.setX(widthDisplay/2);
         combinacions.setY(150+heightDisplay/2);
         constraintLayout.addView(combinacions);
@@ -360,6 +370,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView textaux = findViewById(Integer.valueOf(id).intValue());
                 textaux.setBackgroundColor(Color.GREEN);
             }
+            newWindow();
         }else{
             if (!diccionari.containsValue(minuscula)){
                 Context context = getApplicationContext();
@@ -380,11 +391,38 @@ public class MainActivity extends AppCompatActivity {
                 int x = 0;
                 String id;
                 for (int i = 0; i < palabraEnviada.length(); i++) {
+                    TreeMap<String,String> auxiliar = new TreeMap<>();
+
+
                     id = i+""+y;
                     UnsortedLinkedListSet<Integer> aux = (UnsortedLinkedListSet<Integer>) lletresSolucio.get(palabraEnviada.charAt(i));
+
                     if (aux.isEmpty()){
                         TextView textaux = findViewById(Integer.valueOf(id).intValue());
                         textaux.setBackgroundColor(Color.GRAY);
+                        //pintar el botó de vermell
+                        int codigoAscii=(int)palabraEnviada.charAt(i);
+                        Button boto = findViewById(Integer.valueOf(codigoAscii).intValue());
+                        boto.setTextColor(Color.RED);
+
+                        Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
+                        Iterator itArbre = setMapping.iterator();
+                        while(itArbre.hasNext()){
+                            Map.Entry<String, String> entry = (Map.Entry<String, String>) itArbre.next();
+                            String value = entry.getValue();
+                            String str = ""+palabraEnviada.charAt(i);
+                            if(!value.contains(str.toLowerCase())){
+                                auxiliar.put((String) entry.getKey(), (String) entry.getValue());
+                            }
+                        }
+
+                        arbre = auxiliar;
+
+                        num_combinacions = arbre.size();
+                        TextView combinacions = findViewById(Integer.valueOf(126).intValue());
+                        String s = ""+num_combinacions;
+                        combinacions.setText(s);
+
                     }
                     if(aux.contains(i+1)){
                         //TextView textaux = findViewById(Integer.valueOf(id).intValue());
@@ -392,7 +430,28 @@ public class MainActivity extends AppCompatActivity {
                         UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
                         llistaPosicions = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(palabraEnviada.charAt(i));
                         llistaPosicions.add(i+1);
+                        int codigoAscii=(int)palabraEnviada.charAt(i);
+                        Button boto = findViewById(Integer.valueOf(codigoAscii).intValue());
+                        boto.setTextColor(Color.GREEN);
                         pistesDescobertes.put(palabraEnviada.charAt(i),llistaPosicions);
+
+                        Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
+                        Iterator itArbre = setMapping.iterator();
+                        while(itArbre.hasNext()){
+                            Map.Entry<String, String> entry = (Map.Entry<String, String>) itArbre.next();
+                            String value = entry.getValue();
+                            String str = ""+palabraEnviada.charAt(i);
+                            if(value.charAt(i)==palabraEnviada.toLowerCase().charAt(i)){
+                                auxiliar.put((String) entry.getKey(), (String) entry.getValue());
+                            }
+                        }
+
+                        arbre = auxiliar;
+                        num_combinacions = arbre.size();
+                        TextView combinacions = findViewById(Integer.valueOf(126).intValue());
+                        String s = ""+num_combinacions;
+                        combinacions.setText(s);
+
                         //Verd TO DO
                     }
                     if (!aux.isEmpty() && !aux.contains(i+1)){
@@ -403,6 +462,23 @@ public class MainActivity extends AppCompatActivity {
                         //TextView textaux = findViewById(Integer.valueOf(id).intValue());
                         //textaux.setBackgroundColor(Color.YELLOW);
                         //Groc TO DO
+
+                        Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
+                        Iterator itArbre = setMapping.iterator();
+                        while(itArbre.hasNext()){
+                            Map.Entry<String, String> entry = (Map.Entry<String, String>) itArbre.next();
+                            String value = entry.getValue();
+                            String str = ""+palabraEnviada.charAt(i);
+                            if(value.contains(str.toLowerCase())&& value.charAt(i)!=palabraEnviada.toLowerCase().charAt(i)){
+                                auxiliar.put((String) entry.getKey(), (String) entry.getValue());
+                            }
+                        }
+
+                        arbre = auxiliar;
+                        num_combinacions = arbre.size();
+                        TextView combinacions = findViewById(Integer.valueOf(126).intValue());
+                        String s = ""+num_combinacions;
+                        combinacions.setText(s);
                     }
                 }
 
@@ -473,7 +549,29 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+  public void newWindow() {
+        /*Iterator it = treeSet.iterator();
+        String str = "";
+        String word;
 
+        while(it.hasNext()){
+            word = it.next().toString();
+
+            if(isSolution(word)){
+                if(isTuti(word)){
+                    str += "<font color = 'red'>" + word + " </font>, ";
+                    System.out.println("Solució i Tuti: " + word);
+                }else{
+                    str += word + ", ";
+                }
+            }
+        }
+
+        str += "</html>";*/
+        Intent intent = new Intent(this, MainActivity2.class);
+        intent.putExtra(EXTRA_MESSAGE, "hOLA") ;
+        startActivity(intent) ;
+    }
 
     private void hideSystemUI() {
         // Enables regular immersive mode.
