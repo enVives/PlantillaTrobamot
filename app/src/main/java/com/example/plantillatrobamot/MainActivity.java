@@ -5,7 +5,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -27,10 +26,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import android.content.Intent;
-import android.os.Bundle;
-import android.text.Html;
 
 public class MainActivity extends AppCompatActivity {
+    private final int posicioIncorrecte = 100;
     // Variables de lògica del joc
     private int lengthWord = 5;
     private int maxTry = 6;
@@ -41,14 +39,18 @@ public class MainActivity extends AppCompatActivity {
     private String palabrasolucion="";
     private String palabraEnviada="";
     UnsortedArrayMapping lletresSolucio;
-    UnsortedArrayMapping pistesDescobertes; //per guardar les pistes descobertes
+    UnsortedArrayMapping lletresCorrectes; //per guardar les pistes descobertes
+
+    UnsortedArrayMapping pistesDescobertes;
     // Variables de construcció de la interfície
     private int num_combinacions;
     public static String grayColor = "#D9E1E8";
     public static String ColorCursor="#FCBA03";
     private int widthDisplay;
     private int heightDisplay;
+    private boolean acabat;
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE ";
+    public static final String EXTRA_MESSAGE2 = "com.example.myfirstapp.MESSAGE2 ";
 
     HashMap<String, String> diccionari = new HashMap<String, String>();
     java.util.Iterator iter;
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void crearInterficie() {
         num_combinacions =0;
+        acabat = false;
         crearGraella();
         llegirdiccionari();
         paraulasolucio();
@@ -301,6 +304,36 @@ public class MainActivity extends AppCompatActivity {
             id=x+""+y;
             textactual=findViewById(Integer.valueOf(id).intValue());
             textactual.setBackground(gd2);
+        }else if((lletra == "Enviar")&&(y == maxTry-1)){
+            if(x != lengthWord){
+                Context context = getApplicationContext();
+                CharSequence mostra = "LLetres Insuficients";
+                int duration = Toast.LENGTH_LONG;
+
+                Toast toast = Toast.makeText(context,mostra,duration);
+                toast.show();
+            }else { //cas darrera fila
+                id = (x - 1) + "" + y;
+                textactual = findViewById(Integer.valueOf(id).intValue());
+                textactual.setBackground(gd);
+
+                //Obtenció de la paraula TO DO
+
+                TextView auxiliar;
+
+                for(int x =0;x<lengthWord;x++){
+                    auxiliar = findViewById(Integer.valueOf(x+""+y).intValue());
+                    palabraEnviada += (String) auxiliar.getText();
+                }
+
+                comprobacio();
+
+                if(!acabat){
+                    newWindow();
+                }
+
+
+            }
         }
     }
 
@@ -310,11 +343,13 @@ public class MainActivity extends AppCompatActivity {
 
         //Iniciar mapping de les lletres
         lletresSolucio = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
+        lletresCorrectes = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
         pistesDescobertes = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
 
         for (int i=0;i< abecedari.length();i++){
             UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
             UnsortedLinkedListSet<Integer> llistaPosicions1= new UnsortedLinkedListSet<Integer>();
+            UnsortedLinkedListSet<Integer> llistaPosicions2= new UnsortedLinkedListSet<Integer>();
             //Bucle per afegir la posició corresponent de les lletres que es troben a sa paraula solucio
             for (int j = 0; j < palabrasolucion.length(); j++) {
                 if (palabrasolucion.charAt(j)==minuscula.charAt(i)){
@@ -323,8 +358,19 @@ public class MainActivity extends AppCompatActivity {
             }
 
             lletresSolucio.put(abecedari.charAt(i),llistaPosicions);
-            pistesDescobertes.put(abecedari.charAt(i),llistaPosicions1);
+            lletresCorrectes.put(abecedari.charAt(i),llistaPosicions1);
+            pistesDescobertes.put(abecedari.charAt(i),llistaPosicions2);
         }
+    }
+
+    private void reiniciar_lletresCorrectes(){
+        String abecedari ="ÇZYXWVUTRSRQPONMLKJIHGFEDCBA";
+        lletresCorrectes = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
+        for (int i=0;i< abecedari.length();i++){
+            UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
+            lletresCorrectes.put(abecedari.charAt(i),llistaPosicions);
+        }
+
     }
     private void llegirdiccionari(){
         InputStream is = getResources().openRawResource(R.raw.paraules);
@@ -374,6 +420,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView textaux = findViewById(Integer.valueOf(id).intValue());
                 textaux.setBackgroundColor(Color.GREEN);
             }
+            acabat = true;
             newWindow();
         }else{
             if (!diccionari.containsValue(minuscula)){
@@ -408,9 +455,11 @@ public class MainActivity extends AppCompatActivity {
                         int codigoAscii=(int)palabraEnviada.charAt(i);
                         Button boto = findViewById(Integer.valueOf(codigoAscii).intValue());
                         boto.setTextColor(Color.RED);
+                        afegir_pista(palabraEnviada.charAt(i),posicioIncorrecte);
 
                         Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
                         Iterator itArbre = setMapping.iterator();
+
                         while(itArbre.hasNext()){
                             Map.Entry<String, String> entry = (Map.Entry<String, String>) itArbre.next();
                             String value = entry.getValue();
@@ -432,12 +481,13 @@ public class MainActivity extends AppCompatActivity {
                         //TextView textaux = findViewById(Integer.valueOf(id).intValue());
                         //textaux.setBackgroundColor(Color.GREEN);
                         UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
-                        llistaPosicions = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(palabraEnviada.charAt(i));
+                        llistaPosicions = (UnsortedLinkedListSet<Integer>) lletresCorrectes.get(palabraEnviada.charAt(i));
                         llistaPosicions.add(i+1);
                         int codigoAscii=(int)palabraEnviada.charAt(i);
                         Button boto = findViewById(Integer.valueOf(codigoAscii).intValue());
                         boto.setTextColor(Color.GREEN);
-                        pistesDescobertes.put(palabraEnviada.charAt(i),llistaPosicions);
+                        lletresCorrectes.put(palabraEnviada.charAt(i),llistaPosicions);
+                        afegir_pista(palabraEnviada.charAt(i),i+1);
 
                         Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
                         Iterator itArbre = setMapping.iterator();
@@ -460,9 +510,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if (!aux.isEmpty() && !aux.contains(i+1)){
                         UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
-                        llistaPosicions = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(palabraEnviada.charAt(i));
+                        llistaPosicions = (UnsortedLinkedListSet<Integer>) lletresCorrectes.get(palabraEnviada.charAt(i));
                         llistaPosicions.add(i+1);
-                        pistesDescobertes.put(palabraEnviada.charAt(i),llistaPosicions);
+                        lletresCorrectes.put(palabraEnviada.charAt(i),llistaPosicions);
+                        afegir_pista(palabraEnviada.charAt(i),-1*(i+1));
                         //TextView textaux = findViewById(Integer.valueOf(id).intValue());
                         //textaux.setBackgroundColor(Color.YELLOW);
                         //Groc TO DO
@@ -486,7 +537,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                Iterator i = pistesDescobertes.iterator();
+                Iterator i = lletresCorrectes.iterator();
 
                 while(i.hasNext()){
                     UnsortedArrayMapping.Pair pair = (UnsortedArrayMapping.Pair) i.next();
@@ -547,13 +598,24 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 palabraEnviada = "";
-                iniciarConjuntLletres(); //millorable
+                reiniciar_lletresCorrectes(); //millorable
             }
         }
+    }
+    private void afegir_pista(char lletra, int posicio){
+        UnsortedLinkedListSet<Integer> llistaPosicions1 = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(lletra);
+        //cas lletra groga
 
+        if(posicio!=posicioIncorrecte){
+            llistaPosicions1.add(posicio);
+        }else{
+            llistaPosicions1.add(posicioIncorrecte);
+        }
+
+        pistesDescobertes.put(lletra,llistaPosicions1);
 
     }
-  public void newWindow() {
+    public void newWindow() {
         /*Iterator it = treeSet.iterator();
         String str = "";
         String word;
@@ -572,8 +634,41 @@ public class MainActivity extends AppCompatActivity {
         }
 
         str += "</html>";*/
+        String restriccions = "Restriccions: ";
+        String paraules_disponibles = "Paraules Possibles: ";
+        Iterator it = pistesDescobertes.iterator();
+
+        Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
+        Iterator itArbre = setMapping.iterator();
+
+        if(!acabat){
+            while(it.hasNext()){
+                UnsortedArrayMapping.Pair pair = (UnsortedArrayMapping.Pair) it.next();
+                String lletra = pair.getKey().toString();
+                UnsortedLinkedListSet<Integer> llistaPosicions = (UnsortedLinkedListSet<Integer>) pair.getValue();
+                if(!llistaPosicions.isEmpty()){
+                    Iterator i = llistaPosicions.iterator();
+                    while(i.hasNext()){
+                        int posicio = (int) i.next();
+                        if(posicio == posicioIncorrecte){
+                            restriccions += "no ha de contenir la "+lletra+",";
+                        }else if(posicio<0){
+                            restriccions+= "conté la "+lletra+" però no a la posició "+posicio+",";
+                        }else{
+                            restriccions+= "conté la "+lletra+" a la posició "+posicio+",";
+                        }
+                    }
+                }
+
+            }
+
+            while(itArbre.hasNext()){
+                paraules_disponibles += itArbre.next() + ", ";
+            }
+        }
         Intent intent = new Intent(this, MainActivity2.class);
-        intent.putExtra(EXTRA_MESSAGE, "hOLA") ;
+        intent.putExtra(EXTRA_MESSAGE,restriccions) ;
+        intent.putExtra(EXTRA_MESSAGE2,paraules_disponibles) ;
         startActivity(intent) ;
     }
 
