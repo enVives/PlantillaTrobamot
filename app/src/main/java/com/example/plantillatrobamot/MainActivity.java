@@ -111,9 +111,13 @@ public class MainActivity extends AppCompatActivity {
         // Definir les característiques del "pinzell"
         gd.setCornerRadius(5);
         gd.setStroke(3, Color.parseColor(grayColor));
-        int amplaria=145,altura=150;
+        int separacionPantalla=90;
         int separacion=20;
-        int textViewSize=((widthDisplay-amplaria*2-separacion*(lengthWord-1)))/lengthWord;
+      //  int amplaria=145,altura=150;
+      //  int separacion=20;
+       // int textViewSize=150/*((widthDisplay-amplaria*2-separacion*(lengthWord-1)))/lengthWord*/;
+        int textViewWidth=((widthDisplay-separacionPantalla*2-separacion*(lengthWord-1))/lengthWord);
+        int textViewHeigh=((heightDisplay-separacionPantalla-850)/maxTry);
         // Crear un TextView
         for(int i=0; i<maxTry;i++){
             for (int j=0;j<lengthWord;j++){
@@ -128,11 +132,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 String fila_columna=j+""+i;
                 textView.setId(Integer.parseInt(fila_columna));
-                textView.setWidth(textViewSize);
-                textView.setHeight(textViewSize);
+                textView.setWidth(textViewWidth);
+                textView.setHeight(textViewHeigh);
                 // Posicionam el TextView
-                textView.setX(amplaria+((j-1)*separacion)+(j*textViewSize));
-                textView.setY(altura +((i-1)*separacion)+(i*textViewSize));
+                textView.setX(j*textViewWidth+separacionPantalla+separacion*j);
+                textView.setY(i*textViewHeigh+separacionPantalla+separacion*i);
                 textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 textView.setTextSize(30);
                 // Afegir el TextView al layout
@@ -211,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
 
         paraula_sol.setId(Integer.valueOf(127).intValue());
         paraula_sol.setX(widthDisplay/2);
-        paraula_sol.setY(100+heightDisplay/2);
+        paraula_sol.setY(300+heightDisplay/2);
 
         paraula_sol.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
         // Afegir el TextView al layout
@@ -222,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
         combinacions.setText(s);
         combinacions.setId(Integer.valueOf(126).intValue());
         combinacions.setX(widthDisplay/2);
-        combinacions.setY(150+heightDisplay/2);
+        combinacions.setY(350+heightDisplay/2);
         constraintLayout.addView(combinacions);
 
     }
