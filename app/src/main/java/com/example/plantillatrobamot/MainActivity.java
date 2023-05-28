@@ -36,7 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private int y = 0;
     private int prova =0;
     private int numeropalabras=0;
-    private String palabrasolucion="";
+    private String paraulasolucio ="";
+    private String palabrasolucioaccent="";
     private String palabraEnviada="";
     UnsortedArrayMapping lletresSolucio;
     UnsortedArrayMapping lletresCorrectes; //per guardar les pistes descobertes
@@ -102,10 +103,10 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < numero; i++) {
             if(iter.hasNext()){
                 Map.Entry entry = (Map.Entry) iter.next();
-                palabrasolucion = (String) entry.getValue();
+                paraulasolucio = (String) entry.getValue();
+                palabrasolucioaccent = (String)entry.getKey();
             }
         }
-
     }
 
     private void crearGraella() {
@@ -214,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         boto.setOnClickListener(this::onClick);
 
         TextView paraula_sol = new TextView(this);
-        paraula_sol.setText(palabrasolucion);
+        paraula_sol.setText(paraulasolucio);
 
         paraula_sol.setId(Integer.valueOf(127).intValue());
         paraula_sol.setX(widthDisplay/2);
@@ -351,8 +352,8 @@ public class MainActivity extends AppCompatActivity {
             UnsortedLinkedListSet<Integer> llistaPosicions1= new UnsortedLinkedListSet<Integer>();
             UnsortedLinkedListSet<Integer> llistaPosicions2= new UnsortedLinkedListSet<Integer>();
             //Bucle per afegir la posició corresponent de les lletres que es troben a sa paraula solucio
-            for (int j = 0; j < palabrasolucion.length(); j++) {
-                if (palabrasolucion.charAt(j)==minuscula.charAt(i)){
+            for (int j = 0; j < paraulasolucio.length(); j++) {
+                if (paraulasolucio.charAt(j)==minuscula.charAt(i)){
                     llistaPosicions.add(j+1); //Posicio de la lletra incial ==1 (Pot ser se tendra que cambiar)
                 }
             }
@@ -398,15 +399,12 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println(error.toString());
             }
         }
-
-
-
     }
 
     private void comprobacio(){
         //Si la paraula no existeix
         String minuscula = palabraEnviada.toLowerCase();
-        if(minuscula.equals(palabrasolucion)){
+        if(minuscula.equals(paraulasolucio)){
             Context context = getApplicationContext();
             CharSequence mostra = "Paraula Correcte";
             int duration = Toast.LENGTH_LONG;

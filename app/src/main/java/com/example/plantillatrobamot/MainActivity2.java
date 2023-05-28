@@ -8,6 +8,10 @@ import android.os.Bundle;
 import android.text.Html;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+
 public class MainActivity2 extends AppCompatActivity {
     private TextView t;
     @Override
@@ -22,6 +26,24 @@ public class MainActivity2 extends AppCompatActivity {
         String messageParaulesPossibles=intent.getStringExtra(MainActivity.EXTRA_MESSAGE2);
 
         t.setText(messageRestriccions+"\n\n"+messageParaulesPossibles);
+    }
+
+    public  String agafaHTML(String paraula){
+        String linea="";
+        try {
+            URL definicio = new URL("https://www.vilaweb.cat/paraulogic/?diec ="+ paraula);
+            BufferedReader in = new BufferedReader (new InputStreamReader(definicio. openStream () ) ) ;
+
+            StringBuffer buffer = new StringBuffer();
+            while ((linea = in.readLine()) != null) {
+                buffer.append(linea);
+                buffer.append("\n");  // Agregar un salto de línea si lo deseas
+            }
+            linea= buffer.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return linea;
     }
 
 }
