@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean acabat;
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE ";
     public static final String EXTRA_MESSAGE2 = "com.example.myfirstapp.MESSAGE2 ";
+    public static final String EXTRA_MESSAGE3 = "com.example.myfirstapp.MESSAGE3 ";
 
     HashMap<String, String> diccionari = new HashMap<String, String>();
     java.util.Iterator iter;
@@ -651,7 +652,7 @@ public class MainActivity extends AppCompatActivity {
                         if(posicio == posicioIncorrecte){
                             restriccions += "no ha de contenir la "+lletra+",";
                         }else if(posicio<0){
-                            restriccions+= "conté la "+lletra+" però no a la posició "+posicio+",";
+                            restriccions+= "conté la "+lletra+" però no a la posició "+-1*posicio+",";
                         }else{
                             restriccions+= "conté la "+lletra+" a la posició "+posicio+",";
                         }
@@ -661,14 +662,21 @@ public class MainActivity extends AppCompatActivity {
             }
 
             while(itArbre.hasNext()){
-                paraules_disponibles += itArbre.next() + ", ";
+                Map.Entry<String,String> entry = (Map.Entry<String,String>) itArbre.next();
+                paraules_disponibles += entry.getKey() + ", ";
             }
+        }else{
+            restriccions=null;
+            paraules_disponibles=null;
         }
         Intent intent = new Intent(this, MainActivity2.class);
         intent.putExtra(EXTRA_MESSAGE,restriccions) ;
         intent.putExtra(EXTRA_MESSAGE2,paraules_disponibles) ;
+        intent.putExtra(EXTRA_MESSAGE3,paraulasolucio) ;
         startActivity(intent) ;
     }
+
+
 
     private void hideSystemUI() {
         // Enables regular immersive mode.

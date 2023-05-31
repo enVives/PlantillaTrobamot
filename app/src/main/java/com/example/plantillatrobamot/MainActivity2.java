@@ -16,6 +16,7 @@ import java.net.URL;
 
 public class MainActivity2 extends AppCompatActivity {
     private TextView t;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,15 +45,14 @@ public class MainActivity2 extends AppCompatActivity {
                  }
         }) ;
 
-        t.setText(messageRestriccions+"\n\n"+messageParaulesPossibles);
+
     }
 
     public  String agafaHTML(String paraula){
         String linea="";
         try {
-            URL definicio = new URL("https://www.vilaweb.cat/paraulogic/?diec ="+ paraula);
+            URL definicio = new URL("https://www.vilaweb.cat/paraulogic/?diec="+ paraula);
             BufferedReader in = new BufferedReader (new InputStreamReader(definicio. openStream () ) ) ;
-
             StringBuffer buffer = new StringBuffer();
             while ((linea = in.readLine()) != null) {
                 buffer.append(linea);
