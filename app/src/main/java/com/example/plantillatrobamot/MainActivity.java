@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
                         //a posicions incorrectes. D'aquestes tres només pintarem la verda i una de groga,
                         //ja que a la paraula solució només hi ha dues 'B's i això dona entendre que efectivament
                         //la paraula solució només té dues 'B's.
+
     UnsortedArrayMapping pistesDescobertes; //mapa on anam guardant les pistes que anam descobrint de cada lletre
     HashMap<String, String> diccionari = new HashMap<String, String>(); //diccionari de paraules catalanes
     TreeMap<String,String> arbre= new TreeMap();//arbre amb les solucios posibles en base a les restriccions
@@ -217,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
 
         boto.setOnClickListener(this::onClick);
 
+        /*
         TextView paraula_sol = new TextView(this);
         paraula_sol.setText(paraulasolucio);
 
@@ -225,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         paraula_sol.setY(300+heightDisplay/2);
 
         paraula_sol.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        constraintLayout.addView(paraula_sol);
+        constraintLayout.addView(paraula_sol);*/
         //creació text view per saber el nombre de solucions posibles
         TextView combinacions = new TextView(this);
         String s = "Hi ha "+num_combinacions+" solucions possibles";
@@ -408,26 +410,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void comprobacio(){
-        //Si la paraula no existeix
+        //Passam la paraula enviada a minuscula per poder tractar-la
         String minuscula = palabraEnviada.toLowerCase();
+        //Cas de si la paraula és la solució
         if(minuscula.equals(paraulasolucio)){
+            //Missatge temporal
             Context context = getApplicationContext();
-            CharSequence mostra = "Paraula Correcte";
+            CharSequence mostra = "Paraula Correcta!";
             int duration = Toast.LENGTH_LONG;
 
             Toast toast = Toast.makeText(context,mostra,duration);
             toast.show();
-
             String id;
             for (int i = 0; i < palabraEnviada.length(); i++) {
                 id = i+""+y;
                 TextView textaux = findViewById(Integer.valueOf(id).intValue());
                 textaux.setBackgroundColor(Color.GREEN);
             }
+            //La partida ja ha acabat
             acabat = true;
             newWindow();
+            //Cas de que s'hagin de fer les comprobacions
         }else{
+            //Cas de que la parula no sigui vàlida
             if (!diccionari.containsValue(minuscula)){
+                //Missatge temporal
                 Context context = getApplicationContext();
                 CharSequence mostra = "Paraula no vàlida!";
                 int duration = Toast.LENGTH_LONG;
@@ -435,6 +442,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast toast = Toast.makeText(context,mostra,duration);
                 toast.show();
 
+                //Bucle per borrar la paraula
                 for(int x =0;x<lengthWord;x++){
                     String id = x+""+y;
                     TextView textaux = findViewById(Integer.valueOf(id).intValue());
@@ -442,25 +450,30 @@ public class MainActivity extends AppCompatActivity {
                 }
                 y-=1;
                 palabraEnviada = "";
+                //Cas e que la paraula sigui vàlida
             }else {
                 int x = 0;
                 String id;
                 for (int i = 0; i < palabraEnviada.length(); i++) {
+
                     TreeMap<String,String> auxiliar = new TreeMap<>();
 
 
                     id = i+""+y;
                     UnsortedLinkedListSet<Integer> aux = (UnsortedLinkedListSet<Integer>) lletresSolucio.get(palabraEnviada.charAt(i));
 
+                    //si la lletra no es troba a la paraula solució
                     if (aux.isEmpty()){
                         TextView textaux = findViewById(Integer.valueOf(id).intValue());
-                        textaux.setBackgroundColor(Color.GRAY);
+                        textaux.setBackgroundColor(Color.RED);
                         //pintar el botó de vermell
                         int codigoAscii=(int)palabraEnviada.charAt(i);
                         Button boto = findViewById(Integer.valueOf(codigoAscii).intValue());
                         boto.setTextColor(Color.RED);
                         afegir_pista(palabraEnviada.charAt(i),posicioIncorrecte);
 
+                        //actualitzam'arbre de possibles solucions
+                        //descartam totes les paraules que tenguin aquesta lletra
                         Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
                         Iterator itArbre = setMapping.iterator();
 
@@ -481,6 +494,7 @@ public class MainActivity extends AppCompatActivity {
                         combinacions.setText(s);
 
                     }
+                    //si la posició de la lletra es correcte
                     if(aux.contains(i+1)){
 
                         //Aquí afegim al mapping de lletres correctes la posició
@@ -495,6 +509,7 @@ public class MainActivity extends AppCompatActivity {
                         afegir_pista(palabraEnviada.charAt(i),i+1);
 
                         //actualitzam l'arbre de solucions possibles
+                        //ens quedam amb les paraules que tenen aquesta lletra a aquesta posició
                         Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
                         Iterator itArbre = setMapping.iterator();
                         while(itArbre.hasNext()){
@@ -514,6 +529,8 @@ public class MainActivity extends AppCompatActivity {
 
                         //Verd TO DO
                     }
+
+                    //la lletra es troba dins la paraula solució però no a aquesta posició
                     if (!aux.isEmpty() && !aux.contains(i+1)){
                         //afegim la posició al mapping de lletres Correctes
                         UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
@@ -521,11 +538,12 @@ public class MainActivity extends AppCompatActivity {
                         llistaPosicions.add(i+1);
                         lletresCorrectes.put(palabraEnviada.charAt(i),llistaPosicions);
 
-                        //cridam al mètode afegirpista
+                        //cridam al mètode afegir pista
                         afegir_pista(palabraEnviada.charAt(i),-1*(i+1));
 
 
                         //actualitzam l'arbre de solucions possibles
+                        //descartam totes les paraules que tenguin aquesta lletra a aquesta posició
                         Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
                         Iterator itArbre = setMapping.iterator();
                         while(itArbre.hasNext()){
@@ -547,10 +565,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //A partir d'aqui ens encarregarem de pintar les lletres grogues i verdes
                 //Hem utilitzat les normes del wordle
-                //Si a la paraula solució i ha dues A's i a la paraula enviar hem posat 3 A's
+                //Si a la paraula solució hi ha dues A's i a la paraula enviar hem posat 3 A's
                 // una a la posició correcte i dues a posicions equivocades
                 //llavors la A de la posició correcte es pinta de verd
-                //però de les altres A's en pintarem la primera de groc i la segona de negre
+                //però de les altres A's en pintarem la primera de groc i la segona de vermella
                 //això es fa per donar a entendre que a la paraula solució només hi ha dues A's
                 //Les posicions de la paraula enviada les hem guardades a lletresCorrectes.
                 //ara bé, només hem guardat les lletres que son verdes o grogues, ja que les
@@ -568,7 +586,7 @@ public class MainActivity extends AppCompatActivity {
                         ArrayList<Integer> grocs = new ArrayList<>();
                         UnsortedLinkedListSet<Integer> teclat = (UnsortedLinkedListSet<Integer>) lletresSolucio.get(lletra.charAt(0));
 
-                        //cercam li la posició de la lletra actual està dins la solució
+                        //cercam si la posició de la lletra actual està dins la solució
                         Iterator llista = nostre.iterator();
                         while(llista.hasNext()){
                             Integer posicio = (Integer) llista.next();
@@ -601,7 +619,7 @@ public class MainActivity extends AppCompatActivity {
                                 }else{
                                     String ide = (grocs.get(k)-1)+""+y;
                                     TextView textaux = findViewById(Integer.valueOf(ide).intValue());
-                                    textaux.setBackgroundColor(Color.GRAY);
+                                    textaux.setBackgroundColor(Color.RED);
                                 }
                             }
                         }else{ //d'altra banda ho pintam tot
@@ -637,7 +655,7 @@ public class MainActivity extends AppCompatActivity {
         pistesDescobertes.put(lletra,llistaPosicions1);
 
     }
-    //comunicacio amb la finestra de victoria/derrota
+    //comunicació amb la finestra de victoria/derrota
     public void newWindow() {
         //variables per passar restriccions y paraules possibles
         String restriccions = "Restriccions: ";
@@ -654,6 +672,7 @@ public class MainActivity extends AppCompatActivity {
                 UnsortedLinkedListSet<Integer> llistaPosicions = (UnsortedLinkedListSet<Integer>) pair.getValue();
                 if(!llistaPosicions.isEmpty()){
                     Iterator i = llistaPosicions.iterator();
+                    //Tractament del String de les restriccions descobertes
                     while(i.hasNext()){
                         int posicio = (int) i.next();
                         if(posicio == posicioIncorrecte){
@@ -667,7 +686,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
-            //bucle d'obtencio de paraules possibles
+            //bucle d'obtenció de paraules possibles
             while(itArbre.hasNext()){
                 Map.Entry<String,String> entry = (Map.Entry<String,String>) itArbre.next();
                 paraules_disponibles += entry.getKey() + ", ";
@@ -676,7 +695,7 @@ public class MainActivity extends AppCompatActivity {
             restriccions=null;
             paraules_disponibles=null;
         }
-        //eviar missatges
+        //enviar missatges
         Intent intent = new Intent(this, MainActivity2.class);
         intent.putExtra(EXTRA_MESSAGE,restriccions) ;
         intent.putExtra(EXTRA_MESSAGE2,paraules_disponibles) ;
