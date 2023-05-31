@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                 textaux.setBackground(gd2);
             }
         }else if((lletra == "Esborrar")){
-            //tractament del curor
+            //tractament del cursor
             if(x==lengthWord){
                 x--;
                 id=x+""+y;
@@ -307,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
             textactual=findViewById(Integer.valueOf(id).intValue());
             textactual.setBackground(gd2);
         }else if((lletra == "Enviar")&&(y == maxTry-1)){
+            //comprobació de paraula enviada
             if(x != lengthWord){
                 Context context = getApplicationContext();
                 CharSequence mostra = "LLetres Insuficients";
@@ -315,35 +316,36 @@ public class MainActivity extends AppCompatActivity {
                 Toast toast = Toast.makeText(context,mostra,duration);
                 toast.show();
             }else { //cas darrera fila
+                //tractament cursor
                 id = (x - 1) + "" + y;
                 textactual = findViewById(Integer.valueOf(id).intValue());
                 textactual.setBackground(gd);
-
-                //Obtenció de la paraula TO DO
-
+                //tractament paraula enviada
                 TextView auxiliar;
-
                 for(int x =0;x<lengthWord;x++){
                     auxiliar = findViewById(Integer.valueOf(x+""+y).intValue());
+                    //obtencio paraula solucio
                     palabraEnviada += (String) auxiliar.getText();
                 }
+                //comprobació de la paraula enviada
                 comprobacio();
+                //si acabat mostrar finestra final
                 if(!acabat){
                     newWindow();
                 }
             }
         }
     }
-
+    //metode per inicialitzar els mappings amb les seves variables
     private void iniciarConjuntLletres(){
+        //abecedari
         String abecedari ="ÇZYXWVUTRSRQPONMLKJIHGFEDCBA";
         String minuscula = abecedari.toLowerCase();
-
         //Iniciar mapping de les lletres
         lletresSolucio = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
         lletresCorrectes = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
         pistesDescobertes = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
-
+        //incialització de les llistes
         for (int i=0;i< abecedari.length();i++){
             UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
             UnsortedLinkedListSet<Integer> llistaPosicions1= new UnsortedLinkedListSet<Integer>();
@@ -354,7 +356,6 @@ public class MainActivity extends AppCompatActivity {
                     llistaPosicions.add(j+1); //Posicio de la lletra incial ==1 (Pot ser se tendra que cambiar)
                 }
             }
-
             lletresSolucio.put(abecedari.charAt(i),llistaPosicions);
             lletresCorrectes.put(abecedari.charAt(i),llistaPosicions1);
             pistesDescobertes.put(abecedari.charAt(i),llistaPosicions2);
@@ -374,16 +375,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    //metode per llegir les paraules del diccionari
     private void llegirdiccionari(){
+        //declarcions del reader y stream per llegir el fitxer
         InputStream is = getResources().openRawResource(R.raw.paraules);
         BufferedReader buffer=null;
         try{
             buffer = new BufferedReader(new InputStreamReader(is)) ;
             String linia = buffer.readLine();
-
+            //bucle de lectura de paraules
             while(linia!=null){
                 String [] paraules = linia.split(";");
                 if(paraules[0].length()== lengthWord){
+                    //ficam les paraules al hashing y a l'arbre
                     diccionari.put(paraules[0],paraules[1]);
                     arbre.put(paraules[0],paraules[1]);
                     numeroparaules++;
@@ -621,10 +625,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    //metode que ens permet afegir pistes que es van descobrint
     private void afegir_pista(char lletra, int posicio){
         UnsortedLinkedListSet<Integer> llistaPosicions1 = (UnsortedLinkedListSet<Integer>) pistesDescobertes.get(lletra);
-        //cas lletra groga
-
         if(posicio!=posicioIncorrecte){
             llistaPosicions1.add(posicio);
         }else{
@@ -634,15 +637,16 @@ public class MainActivity extends AppCompatActivity {
         pistesDescobertes.put(lletra,llistaPosicions1);
 
     }
+    //comunicacio amb la finestra de victoria/derrota
     public void newWindow() {
-
+        //variables per passar restriccions y paraules possibles
         String restriccions = "Restriccions: ";
         String paraules_disponibles = "Paraules Possibles: ";
+        //iteradors
         Iterator it = pistesDescobertes.iterator();
-
         Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
         Iterator itArbre = setMapping.iterator();
-
+        //tractamet per obtenir restriccions y paraules possibles
         if(!acabat){
             while(it.hasNext()){
                 UnsortedArrayMapping.Pair pair = (UnsortedArrayMapping.Pair) it.next();
@@ -663,7 +667,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
-
+            //bucle d'obtencio de paraules possibles
             while(itArbre.hasNext()){
                 Map.Entry<String,String> entry = (Map.Entry<String,String>) itArbre.next();
                 paraules_disponibles += entry.getKey() + ", ";
@@ -672,6 +676,7 @@ public class MainActivity extends AppCompatActivity {
             restriccions=null;
             paraules_disponibles=null;
         }
+        //eviar missatges
         Intent intent = new Intent(this, MainActivity2.class);
         intent.putExtra(EXTRA_MESSAGE,restriccions) ;
         intent.putExtra(EXTRA_MESSAGE2,paraules_disponibles) ;
