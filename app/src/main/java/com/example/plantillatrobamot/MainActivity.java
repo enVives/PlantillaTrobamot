@@ -34,32 +34,32 @@ public class MainActivity extends AppCompatActivity {
     private int maxTry = 6;
     private int x = 0;
     private int y = 0;
-    private int prova =0;
-    private int numeropalabras=0;
-    private String paraulasolucio ="";
-    private String palabrasolucioaccent="";
-    private String palabraEnviada="";
-    UnsortedArrayMapping lletresSolucio;
-    UnsortedArrayMapping lletresCorrectes; //per guardar les pistes descobertes
+    private int numeroparaules =0; //contador de paraules del diccionari
+    private String paraulasolucio =""; //conté la paraula solució
+    private String palabrasolucioaccent=""; //paraula solució amb accent
+    private String palabraEnviada=""; //paraula que enviam per teclat
+    private int num_combinacions;   //acumula el numero de solucions disponibles
+    UnsortedArrayMapping lletresSolucio; //mapping del teclat, on key = lletra, value = llista de posicions
+    UnsortedArrayMapping lletresCorrectes; //Mapping on, cada vegada que pitjam enviar, guardam les posicions
+                        //de les lletres verdes i grogues, això ens interessa perquè amb aquestes lletres
+                        //hi pot haver conflicte. Suposem que a la paraula solució hi ha dues lletres
+                        //'B' i nosaltres n'hem posat 3, una a la posició correcte i les altres dues
+                        //a posicions incorrectes. D'aquestes tres només pintarem la verda i una de groga,
+                        //ja que a la paraula solució només hi ha dues 'B's i això dona entendre que efectivament
+                        //la paraula solució només té dues 'B's.
+    UnsortedArrayMapping pistesDescobertes; //mapa on anam guardant les pistes que anam descobrint de cada lletre
+    HashMap<String, String> diccionari = new HashMap<String, String>(); //diccionari de paraules catalanes
+    TreeMap<String,String> arbre= new TreeMap();//arbre amb les solucios posibles en base a les restriccions
 
-    UnsortedArrayMapping pistesDescobertes;
     // Variables de construcció de la interfície
-    private int num_combinacions;
-    public static String grayColor = "#D9E1E8";
-    public static String ColorCursor="#FCBA03";
-    private int widthDisplay;
-    private int heightDisplay;
-    private boolean acabat;
-    public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE ";
+    public static String grayColor = "#D9E1E8"; //color caselles
+    public static String ColorCursor="#FCBA03"; //color taronja per cursor
+    private int widthDisplay;   //amplaria de la pantalla
+    private int heightDisplay; //altura de la pantalla
+    private boolean acabat; // acabat = true si hem trobat la paraula solució
+    public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE "; //missatges per a la finestra nova
     public static final String EXTRA_MESSAGE2 = "com.example.myfirstapp.MESSAGE2 ";
     public static final String EXTRA_MESSAGE3 = "com.example.myfirstapp.MESSAGE3 ";
-
-    HashMap<String, String> diccionari = new HashMap<String, String>();
-    java.util.Iterator iter;
-
-    TreeMap<String,String> arbre= new TreeMap();
-
-    private Iterator it;
     GradientDrawable gd2 = new GradientDrawable();
     GradientDrawable gd = new GradientDrawable();
 
@@ -85,42 +85,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void crearInterficie() {
-        num_combinacions =0;
         acabat = false;
-        crearGraella();
-        llegirdiccionari();
-        paraulasolucio();
-        iniciarConjuntLletres();
-        crearTeclat2();
-
-        //prova();
+        crearGraella(); //cream la graella de les lletres
+        llegirdiccionari(); //llegim les paraules del diccionari
+        paraulasolucio(); //cream una paraula solució
+        iniciarConjuntLletres(); //iniciam els mappings que utilitzarem de les lletres
+        crearTeclat2(); //cream el teclat
     }
 
+    //metode per generar la paraula solucio
     private void paraulasolucio(){
-        String clau="";
+        //generació paraula aleatoria
         Random ran = new Random();
-        int numero = ran.nextInt(numeropalabras);
-        iter = diccionari.entrySet().iterator();
+        int numero = ran.nextInt(numeroparaules);
+        //cerca de la paraula
+        Iterator iter = diccionari.entrySet().iterator();
         for (int i = 0; i < numero; i++) {
             if(iter.hasNext()){
                 Map.Entry entry = (Map.Entry) iter.next();
+                //obtencio de la paraula solucio
                 paraulasolucio = (String) entry.getValue();
                 palabrasolucioaccent = (String)entry.getKey();
             }
         }
     }
-
+    //metode per crear la graella de textviews
     private void crearGraella() {
         ConstraintLayout constraintLayout = findViewById(R.id.layout);
-
         // Definir les característiques del "pinzell"
         gd.setCornerRadius(5);
         gd.setStroke(3, Color.parseColor(grayColor));
         int separacionPantalla=90;
         int separacion=20;
-      //  int amplaria=145,altura=150;
-      //  int separacion=20;
-       // int textViewSize=150/*((widthDisplay-amplaria*2-separacion*(lengthWord-1)))/lengthWord*/;
+        //definim caracteristiques d'amplitud i altura dels textviews de la graella
         int textViewWidth=((widthDisplay-separacionPantalla*2-separacion*(lengthWord-1))/lengthWord);
         int textViewHeigh=((heightDisplay-separacionPantalla-850)/maxTry);
         // Crear un TextView
@@ -128,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
             for (int j=0;j<lengthWord;j++){
                 TextView textView = new TextView(this);
                 textView.setText("");
+                //tractament del cursor
                 if(i==0 &&j==0){
                     gd2.setCornerRadius(5);
                     gd2.setStroke(3, Color.parseColor(ColorCursor));
@@ -149,21 +147,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+    //metode per crear el teclat
     private void crearTeclat2(){
-
+        //constants dels botons
         ConstraintLayout constraintLayout = findViewById(R.id.layout);
         int buttonWidth = 103;
         int buttonHeight = 90;
         int separació_x = 15;
-
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         params.height = buttonHeight;
         params.width = buttonWidth;
-
         float altura = heightDisplay -50;
         float amplaria = widthDisplay;
-        it = lletresSolucio.iterator();
+        //recorregut per creació dels botons
+        Iterator it = lletresSolucio.iterator();
         for(int i = 0; i<3 ;i++){
             amplaria = widthDisplay;
             for(int j =0;j <9;j++){
@@ -171,14 +168,17 @@ public class MainActivity extends AppCompatActivity {
                 if(it.hasNext()){
                 UnsortedArrayMapping.Pair p = (UnsortedArrayMapping.Pair) it.next();
                 boto.setText(p.getKey().toString());
+                //tractament per establir id en un futur i poder pintar de color
                 char letra =p.getKey().toString().charAt(0);
                 int codigoAscii=(int)letra;
                 boto.setId(codigoAscii);
                 }else{
                     boto.setText("");
                 }
+                //estetica dels botons
                 boto.setLayoutParams(params);
                 boto.setBackgroundColor(Color.parseColor(grayColor));
+                //posicionament del botons
                 boto.setX(amplaria - (buttonWidth+separació_x));
                 boto.setY(altura - (buttonHeight + separació_x));
                 amplaria = boto.getX();
@@ -187,28 +187,30 @@ public class MainActivity extends AppCompatActivity {
             }
             altura = altura - (buttonHeight + separació_x);
         }
-
+        //obtencio de parametres
         float mig = widthDisplay/2;
         buttonWidth = 180;
         params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         params.height = buttonHeight;
         params.width = buttonWidth;
 
-
+        //creació botó de borrar
         Button boto = new Button(this);
         boto.setText("Esborrar");
         boto.setLayoutParams(params);
         boto.setBackgroundColor(Color.parseColor(grayColor));
+        //posicionament del boto
         boto.setX(mig-separació_x-buttonWidth);
         boto.setY(altura- (separació_x*2) -buttonHeight);
         constraintLayout.addView(boto);
         boto.setOnClickListener(this::onClick);
 
-
+        //creació botó de enviar
         boto = new Button(this);
         boto.setText("Enviar");
         boto.setLayoutParams(params);
         boto.setBackgroundColor(Color.parseColor(grayColor));
+         //posicionament del boto
         boto.setX(mig+separació_x);
         boto.setY(altura- (separació_x*2) -buttonHeight);
         constraintLayout.addView(boto);
@@ -223,31 +225,32 @@ public class MainActivity extends AppCompatActivity {
         paraula_sol.setY(300+heightDisplay/2);
 
         paraula_sol.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        // Afegir el TextView al layout
         constraintLayout.addView(paraula_sol);
-
+        //creació text view per saber el nombre de solucions posibles
         TextView combinacions = new TextView(this);
-        String s = ""+num_combinacions;
+        String s = "Hi ha "+num_combinacions+" solucions possibles";
         combinacions.setText(s);
         combinacions.setId(Integer.valueOf(126).intValue());
-        combinacions.setX(widthDisplay/2);
+        //posicionamet de textview
+        combinacions.setX(-200+widthDisplay/2);
         combinacions.setY(350+heightDisplay/2);
         constraintLayout.addView(combinacions);
 
     }
+    //metode onclick per comprovar sihi ha click
     public void onClick(View v) {
+        //obtencio de boto pulsat
         Button boto = (Button) v;
         String lletra = boto.getText().toString();
-
         TextView textactual=null;
         String id= x+""+y;
+        //comprobacions logiques del joc
         if((lletra != "Enviar")&&(lletra != "Esborrar")&&(x!= lengthWord)){
             textactual = findViewById ( Integer . valueOf ( id ) . intValue () );
+            //tractament del cursor dels texts views
             TextView textsiguiente;
             textactual.setText(lletra);
             textactual.setBackground(gd);
-
-
             x+=1;
             id=x+""+y;
             if(x<lengthWord) {
@@ -259,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
                 textactual.setBackground(gd2);
             }
         }else if((lletra == "Enviar")&&(y != maxTry-1)){
+            //tractament de longitud
             if(x != lengthWord){
                 Context context = getApplicationContext();
                 CharSequence mostra = "LLetres Insuficients";
@@ -267,31 +271,27 @@ public class MainActivity extends AppCompatActivity {
                 Toast toast = Toast.makeText(context,mostra,duration);
                 toast.show();
             }else {
+                //tractament del cursor y obtencio de la paraula enviada
                 id = (x - 1) + "" + y;
                 textactual = findViewById(Integer.valueOf(id).intValue());
                 textactual.setBackground(gd);
-
-                //Obtenció de la paraula TO DO
-
                 TextView auxiliar;
-
                 for(int x =0;x<lengthWord;x++){
+                    //obetencio de la paraula enviada
                     auxiliar = findViewById(Integer.valueOf(x+""+y).intValue());
                     palabraEnviada += (String) auxiliar.getText();
                 }
-
+                //comprobació de la paraula enviada
                 comprobacio();
-
+                //tractament cursor
                 x = 0;
                 y += 1;
                 id = x + "" + y;
                 TextView textaux = findViewById(Integer.valueOf(id).intValue());
                 textaux.setBackground(gd2);
-
             }
-
-
         }else if((lletra == "Esborrar")){
+            //tractament del curor
             if(x==lengthWord){
                 x--;
                 id=x+""+y;
@@ -327,14 +327,10 @@ public class MainActivity extends AppCompatActivity {
                     auxiliar = findViewById(Integer.valueOf(x+""+y).intValue());
                     palabraEnviada += (String) auxiliar.getText();
                 }
-
                 comprobacio();
-
                 if(!acabat){
                     newWindow();
                 }
-
-
             }
         }
     }
@@ -365,6 +361,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //al mapping de lletres correctes només ens interessa guardar les posicions de les lletres verdes
+    //i grogues cada vegada que pitjam enviar, per tant, després d'haver pitjat enviar i haver pintat
+    //ja les lletres buidarem el mapping perquè no s'acumulin posicions, ja que això per aquest cas no ens
+    //interessa.
     private void reiniciar_lletresCorrectes(){
         String abecedari ="ÇZYXWVUTRSRQPONMLKJIHGFEDCBA";
         lletresCorrectes = new UnsortedArrayMapping<String,UnsortedLinkedListSet<Integer>>(abecedari.length());
@@ -386,7 +386,7 @@ public class MainActivity extends AppCompatActivity {
                 if(paraules[0].length()== lengthWord){
                     diccionari.put(paraules[0],paraules[1]);
                     arbre.put(paraules[0],paraules[1]);
-                    numeropalabras++;
+                    numeroparaules++;
                 }
                 linia = buffer.readLine();
             }
@@ -395,6 +395,7 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(error.toString());
         }finally{
             try{
+                num_combinacions = arbre.size();
                 buffer.close();
             }catch(Exception error){
                 System.out.println(error.toString());
@@ -472,22 +473,24 @@ public class MainActivity extends AppCompatActivity {
 
                         num_combinacions = arbre.size();
                         TextView combinacions = findViewById(Integer.valueOf(126).intValue());
-                        String s = ""+num_combinacions;
+                        String s = "Hi ha "+num_combinacions+" solucions possibles";
                         combinacions.setText(s);
 
                     }
                     if(aux.contains(i+1)){
-                        //TextView textaux = findViewById(Integer.valueOf(id).intValue());
-                        //textaux.setBackgroundColor(Color.GREEN);
+
+                        //Aquí afegim al mapping de lletres correctes la posició
                         UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
                         llistaPosicions = (UnsortedLinkedListSet<Integer>) lletresCorrectes.get(palabraEnviada.charAt(i));
                         llistaPosicions.add(i+1);
+                        lletresCorrectes.put(palabraEnviada.charAt(i),llistaPosicions);
                         int codigoAscii=(int)palabraEnviada.charAt(i);
                         Button boto = findViewById(Integer.valueOf(codigoAscii).intValue());
                         boto.setTextColor(Color.GREEN);
-                        lletresCorrectes.put(palabraEnviada.charAt(i),llistaPosicions);
+                        //cridam al mètode afegir pista
                         afegir_pista(palabraEnviada.charAt(i),i+1);
 
+                        //actualitzam l'arbre de solucions possibles
                         Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
                         Iterator itArbre = setMapping.iterator();
                         while(itArbre.hasNext()){
@@ -502,21 +505,23 @@ public class MainActivity extends AppCompatActivity {
                         arbre = auxiliar;
                         num_combinacions = arbre.size();
                         TextView combinacions = findViewById(Integer.valueOf(126).intValue());
-                        String s = ""+num_combinacions;
+                        String s = "Hi ha "+num_combinacions+" solucions possibles";
                         combinacions.setText(s);
 
                         //Verd TO DO
                     }
                     if (!aux.isEmpty() && !aux.contains(i+1)){
+                        //afegim la posició al mapping de lletres Correctes
                         UnsortedLinkedListSet<Integer> llistaPosicions= new UnsortedLinkedListSet<Integer>();
                         llistaPosicions = (UnsortedLinkedListSet<Integer>) lletresCorrectes.get(palabraEnviada.charAt(i));
                         llistaPosicions.add(i+1);
                         lletresCorrectes.put(palabraEnviada.charAt(i),llistaPosicions);
-                        afegir_pista(palabraEnviada.charAt(i),-1*(i+1));
-                        //TextView textaux = findViewById(Integer.valueOf(id).intValue());
-                        //textaux.setBackgroundColor(Color.YELLOW);
-                        //Groc TO DO
 
+                        //cridam al mètode afegirpista
+                        afegir_pista(palabraEnviada.charAt(i),-1*(i+1));
+
+
+                        //actualitzam l'arbre de solucions possibles
                         Set<Map.Entry<String,String>> setMapping = arbre.entrySet();
                         Iterator itArbre = setMapping.iterator();
                         while(itArbre.hasNext()){
@@ -531,10 +536,21 @@ public class MainActivity extends AppCompatActivity {
                         arbre = auxiliar;
                         num_combinacions = arbre.size();
                         TextView combinacions = findViewById(Integer.valueOf(126).intValue());
-                        String s = ""+num_combinacions;
+                        String s = "Hi ha "+num_combinacions+" solucions possibles";
                         combinacions.setText(s);
                     }
                 }
+
+                //A partir d'aqui ens encarregarem de pintar les lletres grogues i verdes
+                //Hem utilitzat les normes del wordle
+                //Si a la paraula solució i ha dues A's i a la paraula enviar hem posat 3 A's
+                // una a la posició correcte i dues a posicions equivocades
+                //llavors la A de la posició correcte es pinta de verd
+                //però de les altres A's en pintarem la primera de groc i la segona de negre
+                //això es fa per donar a entendre que a la paraula solució només hi ha dues A's
+                //Les posicions de la paraula enviada les hem guardades a lletresCorrectes.
+                //ara bé, només hem guardat les lletres que son verdes o grogues, ja que les
+                //grises no tenen conflicte, sempre son grises.
 
                 Iterator i = lletresCorrectes.iterator();
 
@@ -543,11 +559,12 @@ public class MainActivity extends AppCompatActivity {
                     String lletra = pair.getKey().toString();
                     UnsortedLinkedListSet<Integer> nostre = (UnsortedLinkedListSet<Integer>) pair.getValue();
 
-                    if(!nostre.isEmpty()){
+                    if(!nostre.isEmpty()){ //si no hem escrit aquesta lletra (no té posicions)
                         ArrayList<Integer> verds = new ArrayList<>();
                         ArrayList<Integer> grocs = new ArrayList<>();
                         UnsortedLinkedListSet<Integer> teclat = (UnsortedLinkedListSet<Integer>) lletresSolucio.get(lletra.charAt(0));
 
+                        //cercam li la posició de la lletra actual està dins la solució
                         Iterator llista = nostre.iterator();
                         while(llista.hasNext()){
                             Integer posicio = (Integer) llista.next();
@@ -560,7 +577,10 @@ public class MainActivity extends AppCompatActivity {
 
                         int numero_verds = verds.size();
                         int numero_grocs = grocs.size();
-                        int total = teclat.getNumero();
+                        int total = teclat.getNumero(); //numero total d'aquesta lletra a la paraula solució
+
+                        //si el numero de lletres verdes i grogues passa el total d'aquesta lletra
+                        //de la paraula solució pintarem totes les verdes, però no totes les grogues
 
                         if(numero_verds+numero_grocs>total){
                             for(int j=0;j<verds.size();j++){
@@ -580,7 +600,7 @@ public class MainActivity extends AppCompatActivity {
                                     textaux.setBackgroundColor(Color.GRAY);
                                 }
                             }
-                        }else{
+                        }else{ //d'altra banda ho pintam tot
                             for(int j=0;j<verds.size();j++){
                                 String ide = (verds.get(j)-1)+""+y;
                                 TextView textaux = findViewById(Integer.valueOf(ide).intValue());
@@ -597,7 +617,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 palabraEnviada = "";
-                reiniciar_lletresCorrectes(); //millorable
+                reiniciar_lletresCorrectes(); //reiniciam el mapping cada cop
             }
         }
     }
@@ -615,24 +635,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void newWindow() {
-        /*Iterator it = treeSet.iterator();
-        String str = "";
-        String word;
 
-        while(it.hasNext()){
-            word = it.next().toString();
-
-            if(isSolution(word)){
-                if(isTuti(word)){
-                    str += "<font color = 'red'>" + word + " </font>, ";
-                    System.out.println("Solució i Tuti: " + word);
-                }else{
-                    str += word + ", ";
-                }
-            }
-        }
-
-        str += "</html>";*/
         String restriccions = "Restriccions: ";
         String paraules_disponibles = "Paraules Possibles: ";
         Iterator it = pistesDescobertes.iterator();
